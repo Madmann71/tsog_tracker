@@ -1,17 +1,23 @@
-// Service Worker для автономной работы и установки PWA Мастерской ТСОГ
-const CACHE_NAME = 'tsog-cache-v1';
+// Service Worker для автономной работы и установки PWA Мастерской ТСОГ (v2 с надежным кэшированием QR и CDN)
+const CACHE_NAME = 'tsog-cache-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js',
+  'https://cdn.tailwindcss.com/3.4.17',
+  'https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js'
 ];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      // Кэшируем локальные файлы обязательно, а CDN-скрипты по возможности
+      return Promise.allSettled(
+        ASSETS_TO_CACHE.map((url) => cache.add(url).catch((err) => console.warn('Cache add warn:', url, err)))
+      );
     }).then(() => self.skipWaiting())
   );
 });
@@ -30,11 +36,11 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Network-First стратегия с фолбэком в кэш для статики и офлайн-режима
+// Network-First стратегия с надежным фолбэком в кэш для статики и офлайн-режима
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Игнорируем сетевые запросы к внешним API (GitHub Gist API или локальный сервер), чтобы данные всегда были живыми
+  // Игнорируем внешние запросы к API баз данных (GitHub Gist API или локальный сервер), чтобы данные всегда были живыми
   if (url.origin.includes('api.github.com') || url.pathname.startsWith('/api/')) {
     return;
   }
@@ -42,8 +48,8 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Если ответ валидный, кэшируем копию
-        if (response && response.status === 200 && response.type === 'basic') {
+        // Кэшируем успешные ответы (включая CORS и opaque для CDN библиотек)
+        if (response && (response.status === 200 || response.type === 'opaque')) {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);
