@@ -44,6 +44,25 @@
     .custom-scroll::-webkit-scrollbar-track {
       background: rgba(15, 23, 42, 0.4);
     }
+    @media print {
+      body * { visibility: hidden !important; }
+      #thermalPrintArea, #thermalPrintArea * { visibility: visible !important; }
+      #thermalPrintArea {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 58mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        display: block !important;
+      }
+      @page {
+        size: 58mm auto;
+        margin: 0;
+      }
+    }
     .custom-scroll::-webkit-scrollbar-thumb {
       background: rgba(71, 85, 105, 0.7);
       border-radius: 9999px;
@@ -70,6 +89,19 @@
 
         <div class="flex items-center gap-1.5 shrink-0">
           <button id="btnOpenQrScanner" type="button" class="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1 text-xs font-medium" title="Сканер QR / Поиск по штрихкоду">
+            <i data-lucide="qr-code" class="w-4 h-4 text-emerald-400"></i>
+            <span class="hidden sm:inline">QR</span>
+          </button>
+
+          <button id="btnOpenThermalModalTop" type="button" class="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/40 transition flex items-center gap-1 text-xs font-medium" title="Печать бирок на термопринтере (Tiny Print / 57мм)">
+            <i data-lucide="printer" class="w-4 h-4 text-purple-400"></i>
+            <span class="hidden sm:inline">Бирки</span>
+          </button>
+
+          <button id="btnOpenExcelModalTop" type="button" class="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-1 text-xs font-medium" title="Экспорт в Excel (.xls / CSV)">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400"></i>
+            <span class="hidden sm:inline">Excel</span>
+          </button> type="button" class="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1 text-xs font-medium" title="Сканер QR / Поиск по штрихкоду">
             <i data-lucide="qr-code" class="w-4 h-4 text-emerald-400"></i>
             <span class="hidden sm:inline">QR</span>
           </button>
@@ -512,6 +544,10 @@
           <div class="bg-slate-950/60 border border-slate-800/90 rounded-xl p-3 flex flex-col items-center justify-center text-center gap-1.5">
             <span class="text-[11px] text-slate-400 font-medium">QR-бирка для наклейки</span>
             <div id="detailQrBox" class="bg-white p-2 rounded-lg"></div>
+            <button id="btnOpenDetailThermalModal" type="button" class="mt-1 px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white font-semibold text-[11px] flex items-center justify-center gap-1.5 shadow-md shadow-purple-950/40 transition" title="Распечатать наклейку на термопринтере Tiny Print">
+              <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+              <span>Печать бирки (Tiny Print)</span>
+            </button>
             <span id="detailQrCaption" class="font-mono text-[10px] text-slate-400">TSOG-001</span>
           </div>
 
@@ -1149,7 +1185,181 @@
     </div>
   </div>
 
-    <!-- LIGHTBOX / FULLSCREEN PHOTO MODAL -->
+    <!-- THERMAL PRINTER / TINY PRINT MODAL -->
+  <div id="thermalPrintModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl w-full max-w-lg max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-900 sticky top-0 z-20">
+        <div class="flex items-center gap-2 min-w-0">
+          <i data-lucide="printer" class="w-4 h-4 text-purple-400 shrink-0"></i>
+          <h3 class="text-sm sm:text-base font-bold text-white truncate">Печать бирок на термопринтере (Tiny Print)</h3>
+        </div>
+        <button id="btnCloseThermalModal" type="button" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-4 overflow-y-auto custom-scroll flex flex-col gap-3.5 text-xs sm:text-sm">
+        <!-- Пояснение по связке с принтером Tiny Print -->
+        <div class="bg-purple-950/40 border border-purple-500/40 rounded-2xl p-3 flex flex-col gap-1.5 text-xs text-purple-200">
+          <div class="flex items-center gap-1.5 font-bold text-white">
+            <i data-lucide="bluetooth" class="w-4 h-4 text-purple-400 shrink-0"></i>
+            <span>Лента 57 мм • Разрешение 384 px (203 DPI) для приложения Tiny Print</span>
+          </div>
+          <p class="text-[11px] text-purple-300 leading-relaxed">
+            Макет сгенерирован 1:1 под ширину термоголовки портативных принтеров (модели C9, C15, X6, Fun Print, Tiny Print). 
+            QR-код выводится с максимальным контрастом и считывается камерой с первого раза.
+          </p>
+        </div>
+
+        <!-- Выбор позиции для печати -->
+        <div id="thermalTargetSelectorBox" class="flex flex-col gap-1">
+          <label for="thermalItemSelect" class="block text-xs text-slate-400 font-medium">Выберите изделие для печати бирки:</label>
+          <select id="thermalItemSelect" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs sm:text-sm focus:outline-none focus:border-purple-500">
+          </select>
+        </div>
+
+        <!-- Выбор шаблона бирки -->
+        <div>
+          <span class="block text-xs text-slate-400 font-medium mb-1.5">Формат и размер этикетки:</span>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button type="button" data-label-template="standard" class="label-tpl-btn py-2 px-1.5 rounded-xl border text-xs font-semibold text-center transition bg-purple-600/20 border-purple-500 text-purple-200">
+              Стандартная<br><span class="text-[10px] text-slate-400 font-normal">57 × 35 мм</span>
+            </button>
+            <button type="button" data-label-template="compact" class="label-tpl-btn py-2 px-1.5 rounded-xl border text-xs font-semibold text-center transition bg-slate-950 border-slate-700 text-slate-300 hover:border-slate-600">
+              Компактная<br><span class="text-[10px] text-slate-400 font-normal">57 × 25 мм</span>
+            </button>
+            <button type="button" data-label-template="cable" class="label-tpl-btn py-2 px-1.5 rounded-xl border text-xs font-semibold text-center transition bg-slate-950 border-slate-700 text-slate-300 hover:border-slate-600">
+              Кабельная<br><span class="text-[10px] text-slate-400 font-normal">57 × 50 мм</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Превью бирки для термоголовки -->
+        <div class="flex flex-col items-center justify-center p-3 bg-slate-950 border border-slate-800 rounded-2xl">
+          <span class="text-[11px] text-slate-400 mb-2 font-mono">Превью для рулона термобумаги 57 мм:</span>
+          <div class="p-2 bg-slate-200 rounded-xl shadow-inner max-w-full overflow-hidden flex items-center justify-center">
+            <canvas id="thermalLabelCanvas" class="max-w-full h-auto border border-dashed border-slate-400 bg-white shadow-md" width="384" height="260"></canvas>
+          </div>
+        </div>
+
+        <!-- Блок печати через Tiny Print -->
+        <div class="flex flex-col gap-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button id="btnShareThermalPng" type="button" class="py-2.5 px-3 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-98 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-purple-950/50 transition">
+              <i data-lucide="share-2" class="w-4 h-4"></i>
+              <span>Отправить в Tiny Print</span>
+            </button>
+            <button id="btnDownloadThermalPng" type="button" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition">
+              <i data-lucide="download" class="w-4 h-4 text-emerald-400"></i>
+              <span>Сохранить PNG в Галерею</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btnCopyThermalClipboard" type="button" class="py-2 px-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-medium flex items-center justify-center gap-1.5 transition">
+              <i data-lucide="copy" class="w-3.5 h-3.5 text-sky-400"></i>
+              <span>Копировать картинку</span>
+            </button>
+            <button id="btnSystemPrintLabel" type="button" class="py-2 px-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-medium flex items-center justify-center gap-1.5 transition">
+              <i data-lucide="printer" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span>Печать из браузера</span>
+            </button>
+          </div>
+
+          <!-- Пошаговая шпаргалка для Tiny Print -->
+          <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5 text-[11px] text-slate-400 flex items-start gap-2">
+            <i data-lucide="help-circle" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i>
+            <div>
+              <strong class="text-slate-300 block mb-0.5">Как распечатать в 2 клика:</strong>
+              1. Нажмите «Отправить в Tiny Print» (или сохраните PNG в Галерею).<br>
+              2. В приложении <strong>Tiny Print</strong> нажмите <em>«Печать фото»</em>, выберите эту наклейку и нажмите <em>«Печать»</em> на подключенный принтер.
+            </div>
+          </div>
+
+          <!-- Пакетная печать ленты -->
+          <div class="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
+            <span class="text-[11px] text-slate-400">Печать всех позиций подряд:</span>
+            <button id="btnBatchPrintRoomTape" type="button" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 transition">
+              <i data-lucide="layers" class="w-3.5 h-3.5 text-purple-400"></i>
+              <span>Лента всего помещения</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXCEL & SPREADSHEET EXPORT MODAL -->
+  <div id="excelExportModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl w-full max-w-lg max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-900 sticky top-0 z-20">
+        <div class="flex items-center gap-2 min-w-0">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+          <h3 class="text-sm sm:text-base font-bold text-white truncate">Экспорт ведомости в Excel и таблицы</h3>
+        </div>
+        <button id="btnCloseExcelModal" type="button" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-4 overflow-y-auto custom-scroll flex flex-col gap-3.5 text-xs sm:text-sm">
+        <div class="bg-emerald-950/40 border border-emerald-500/40 rounded-2xl p-3 flex flex-col gap-1 text-xs text-emerald-200">
+          <span class="font-bold text-white flex items-center gap-1.5">
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+            Официальная ведомость для штаба и довольствующих служб
+          </span>
+          <p class="text-[11px] text-emerald-300 leading-relaxed">
+            Выгрузка формируется на русском языке с авто-шириной столбцов, выделением статусов ремонта и дефицита ЗИП, и формулами итогов.
+          </p>
+        </div>
+
+        <div>
+          <label for="excelExportScopeSelect" class="block text-xs text-slate-400 font-medium mb-1.5">1. Объем выгрузки (фильтр данных):</label>
+          <select id="excelExportScopeSelect" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs sm:text-sm focus:outline-none focus:border-emerald-500">
+            <option value="all">Вся мастерская (все 4 помещения)</option>
+            <option value="current">Только текущее открытое помещение</option>
+            <option value="devices">Только приборы и узлы ТСОГ</option>
+            <option value="attention">Только требующие внимания (дефицит ЗИП, ТО, ремонт)</option>
+            <option value="filtered">Только результаты текущего поиска</option>
+          </select>
+        </div>
+
+        <div id="excelExportSummaryStrip" class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex items-center justify-between text-xs">
+          <div>
+            <span class="text-slate-400 block text-[11px]">Позиций к выгрузке:</span>
+            <span id="excelExportCountLabel" class="font-bold text-white font-mono text-sm">8 позиций</span>
+          </div>
+          <div class="text-right">
+            <span class="text-slate-400 block text-[11px]">Ответственный мастер:</span>
+            <span id="excelExportAuthorLabel" class="text-slate-200 font-medium text-xs">Николай (Ст. мастер)</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2 pt-1">
+          <button id="btnDownloadExcelXls" type="button" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/50 transition">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Скачать ведомость Excel (.xls с оформлением)</span>
+          </button>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button id="btnDownloadCsv" type="button" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition">
+              <i data-lucide="file-text" class="w-4 h-4 text-sky-400"></i>
+              <span>Скачать CSV (для 1C)</span>
+            </button>
+            <button id="btnCopyExcelToClipboard" type="button" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition">
+              <i data-lucide="clipboard" class="w-4 h-4 text-amber-400"></i>
+              <span>Копировать в буфер</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIDDEN PRINT AREA FOR 58MM THERMAL PRINTERS -->
+  <div id="thermalPrintArea" class="hidden"></div>
+
+  <!-- LIGHTBOX / FULLSCREEN PHOTO MODAL -->
   <div id="imageLightboxModal" class="fixed inset-0 z-50 hidden bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-3 sm:p-6">
     <div class="absolute top-4 right-4 z-10 flex items-center gap-2">
       <button id="btnCloseLightbox" type="button" class="p-2.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-white shadow-xl transition" title="Закрыть">
@@ -3135,6 +3345,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
       const appView = document.getElementById('authenticatedAppView');
       const fabAdd = document.getElementById('fabAddItem');
       const qrBtn = document.getElementById('btnOpenQrScanner');
+      const thermalBtn = document.getElementById('btnOpenThermalModalTop');
+      const excelBtn = document.getElementById('btnOpenExcelModalTop');
       const logBtn = document.getElementById('btnOpenLog');
       const cloudBtn = document.getElementById('btnOpenCloud');
       const btnLogout = document.getElementById('btnLogoutHeader');
@@ -3146,6 +3358,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
         if (appView) appView.classList.add('hidden');
         if (fabAdd) fabAdd.classList.add('hidden');
         if (qrBtn) qrBtn.classList.add('hidden');
+        if (thermalBtn) thermalBtn.classList.add('hidden');
+        if (excelBtn) excelBtn.classList.add('hidden');
         if (logBtn) logBtn.classList.add('hidden');
         if (cloudBtn) cloudBtn.classList.add('hidden');
         if (btnLogout) btnLogout.classList.add('hidden');
@@ -3160,6 +3374,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
       if (lockView) lockView.classList.add('hidden');
       if (appView) appView.classList.remove('hidden');
       if (qrBtn) qrBtn.classList.remove('hidden');
+      if (thermalBtn) thermalBtn.classList.remove('hidden');
+      if (excelBtn) excelBtn.classList.remove('hidden');
       if (logBtn) logBtn.classList.remove('hidden');
       if (cloudBtn) cloudBtn.classList.remove('hidden');
       if (btnLogout) btnLogout.classList.remove('hidden');
@@ -4649,9 +4865,881 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       }
     }
 
+    
+    // =========================================================================
+    // МОДУЛЬ ТЕРМОПЕЧАТИ БИРОК (TINY PRINT / 57 ММ / 203 DPI)
+    // =========================================================================
+    let currentThermalTemplate = 'standard';
+    let currentThermalItemId = null;
+
+    function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 3) {
+      const words = String(text || '').split(' ');
+      let line = '';
+      let lineCount = 0;
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line.trim(), x, y);
+          line = words[n] + ' ';
+          y += lineHeight;
+          lineCount++;
+          if (lineCount >= maxLines - 1 && n < words.length - 1) {
+            line += '...';
+            break;
+          }
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line.trim(), x, y);
+    }
+
+    function truncateCanvasStr(str, maxChars) {
+      str = String(str || '');
+      if (str.length <= maxChars) return str;
+      return str.slice(0, maxChars - 1) + '…';
+    }
+
+    function drawThermalSticker(canvas, item, templateType = 'standard') {
+      if (!canvas || !item) return;
+      const ctx = canvas.getContext('2d');
+      const w = 384; // 384 dots = 48 mm активная область термоголовки (лента 57 мм при 203 DPI)
+      let h = 260;
+      if (templateType === 'compact') h = 190;
+      if (templateType === 'cable') h = 390;
+
+      canvas.width = w;
+      canvas.height = h;
+
+      // 1. Идеально белый фон
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#000000';
+      ctx.strokeStyle = '#000000';
+
+      // 2. Двойная защитная рамка
+      ctx.lineWidth = 3;
+      ctx.strokeRect(5, 5, w - 10, h - 10);
+      ctx.lineWidth = 1;
+      ctx.strokeRect(8, 8, w - 16, h - 16);
+
+      // 3. Шапка с пограничной символикой
+      ctx.fillRect(9, 9, w - 18, 24);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('★ МАСТЕРСКАЯ ТСОГ • ЛИДА ★', w / 2, 21);
+
+      // 4. Генерация валидной матрицы QR
+      const codeStr = item.code || item.id || 'TSOG';
+      let qrInstance = null;
+      if (window.QRCodeGenerator && window.QRCodeGenerator.QRCode) {
+        try {
+          const qr = new window.QRCodeGenerator.QRCode(-1, window.QRCodeGenerator.QRErrorCorrectLevel.M);
+          qr.addData(codeStr);
+          qr.make();
+          qrInstance = qr;
+        } catch (e) {
+          console.warn('QR error:', e);
+        }
+      }
+
+      ctx.fillStyle = '#000000';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+
+      if (templateType === 'compact') {
+        // Компактный стикер 57х25 мм (для ЗИП, пакетиков, деталей)
+        const qrSize = 96;
+        const qrX = 14, qrY = 38;
+        if (qrInstance) drawQrModulesOnCanvas(ctx, qrInstance, qrX, qrY, qrSize);
+
+        const tx = 118;
+        ctx.font = 'bold 20px "JetBrains Mono", monospace';
+        ctx.fillText(item.code || '', tx, 38);
+
+        ctx.font = 'bold 11px Inter, sans-serif';
+        wrapCanvasText(ctx, item.name, tx, 62, w - tx - 12, 14, 2);
+
+        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.fillText(truncateCanvasStr(item.serial ? item.serial : 'Б/Н', 22), tx, 92);
+
+        ctx.font = '10px Inter, sans-serif';
+        ctx.fillText(`Ост: ${item.qty} ${item.unit || 'шт.'} • ${ROOMS[item.room]?.shortName || ''}`, tx, 108);
+
+        ctx.font = 'bold 10px Inter, sans-serif';
+        ctx.fillText(STATUSES[item.status]?.label || '', tx, 124);
+
+      } else if (templateType === 'cable') {
+        // Кабельная бирка 57х50 мм (для муфт МТОК, бронекабелей, кроссов)
+        const qrSize = 116;
+        const qrX = w - qrSize - 16, qrY = 38;
+        if (qrInstance) drawQrModulesOnCanvas(ctx, qrInstance, qrX, qrY, qrSize);
+
+        const leftW = w - qrSize - 32;
+        ctx.font = 'bold 22px "JetBrains Mono", monospace';
+        ctx.fillText(item.code || '', 16, 38);
+
+        ctx.font = 'bold 12px Inter, sans-serif';
+        wrapCanvasText(ctx, item.name, 16, 64, leftW, 16, 2);
+
+        ctx.font = 'bold 11px "JetBrains Mono", monospace';
+        ctx.fillText(truncateCanvasStr(item.serial ? item.serial : 'Б/Н', 20), 16, 100);
+
+        ctx.font = '11px Inter, sans-serif';
+        ctx.fillText(`Локация: ${ROOMS[item.room]?.shortName || ''}`, 16, 118);
+
+        // Разделительная черта
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(9, 142);
+        ctx.lineTo(w - 9, 142);
+        ctx.stroke();
+
+        // Паспортные данные кабеля / изделия
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.fillText('ПАСПОРТ ОБЪЕКТА / ЛИНИИ ТСОГ:', 16, 150);
+
+        ctx.font = '11px Inter, sans-serif';
+        ctx.fillText(`• Привязка: ${truncateCanvasStr(item.unitOrigin || 'Не указана', 30)}`, 16, 170);
+        ctx.fillText(`• Кол-во / Длина: ${item.qty} ${item.unit || 'шт.'}`, 16, 190);
+        ctx.fillText(`• Состояние: ${STATUSES[item.status]?.label || 'Исправен'}`, 16, 210);
+
+        if (Number(item.resMax) > 0) {
+          ctx.fillText(`• Наработка КИП: ${item.resCurrent} / ${item.resMax} циклов`, 16, 230);
+        } else if (item.nextMaint) {
+          ctx.fillText(`• Срок очередного ТО: ${item.nextMaint}`, 16, 230);
+        } else {
+          ctx.fillText(`• Ответственный: ${truncateCanvasStr(item.assignee || 'Коля', 25)}`, 16, 230);
+        }
+
+        if (item.notes) {
+          ctx.font = '10px Inter, sans-serif';
+          ctx.fillText('• Примечание: ' + truncateCanvasStr(item.notes, 38), 16, 252);
+        }
+
+      } else {
+        // Стандартная бирка 57х35 мм (для всех блоков, приборов, коробок и АКБ)
+        const qrSize = 124;
+        const qrX = w - qrSize - 16, qrY = 38;
+        if (qrInstance) drawQrModulesOnCanvas(ctx, qrInstance, qrX, qrY, qrSize);
+
+        const leftW = w - qrSize - 30;
+        ctx.font = 'bold 22px "JetBrains Mono", monospace';
+        ctx.fillText(item.code || '', 16, 38);
+
+        ctx.font = 'bold 12px Inter, sans-serif';
+        wrapCanvasText(ctx, item.name, 16, 64, leftW, 16, 3);
+
+        ctx.font = 'bold 11px "JetBrains Mono", monospace';
+        ctx.fillText(truncateCanvasStr(item.serial ? item.serial : 'Б/Н', 20), 16, 116);
+
+        ctx.font = '11px Inter, sans-serif';
+        ctx.fillText(truncateCanvasStr(ROOMS[item.room]?.name || '', 22), 16, 134);
+
+        // Разделитель
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(9, 154);
+        ctx.lineTo(w - 9, 154);
+        ctx.stroke();
+
+        // Нижняя строка реквизитов
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.fillText(`Остаток: ${item.qty} ${item.unit || 'шт.'}`, 16, 164);
+        ctx.fillText(`Статус: ${STATUSES[item.status]?.label || 'Исправен'}`, 16, 182);
+
+        ctx.textAlign = 'right';
+        if (item.unitOrigin) {
+          ctx.fillText(truncateCanvasStr(item.unitOrigin, 20), w - 16, 164);
+        }
+        if (item.nextMaint) {
+          ctx.fillText(`ТО: ${item.nextMaint}`, w - 16, 182);
+        } else {
+          ctx.fillText(`Мастер: ${truncateCanvasStr(item.assignee || 'Коля', 18)}`, w - 16, 182);
+        }
+      }
+
+      // Линия отреза / перфорация внизу
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(0, h - 2);
+      ctx.lineTo(w, h - 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    function drawQrModulesOnCanvas(ctx, qr, x, y, size) {
+      const count = qr.getModuleCount();
+      const cellSize = size / count;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(x - 2, y - 2, size + 4, size + 4);
+      ctx.fillStyle = '#000000';
+
+      for (let r = 0; r < count; r++) {
+        for (let c = 0; c < count; c++) {
+          if (qr.isDark(r, c)) {
+            const rx = Math.round(x + c * cellSize);
+            const ry = Math.round(y + r * cellSize);
+            const rw = Math.ceil(cellSize + 0.1);
+            const rh = Math.ceil(cellSize + 0.1);
+            ctx.fillRect(rx, ry, rw, rh);
+          }
+        }
+      }
+    }
+
+    function openThermalPrintModal(targetItemId = null) {
+      const modal = document.getElementById('thermalPrintModal');
+      const itemSelect = document.getElementById('thermalItemSelect');
+      if (!modal || !itemSelect) return;
+
+      // Заполнение списка позиций
+      itemSelect.innerHTML = state.items.map(it => {
+        const roomName = ROOMS[it.room]?.shortName || it.room;
+        return `<option value="${escapeHtml(it.id)}">[${escapeHtml(it.code)}] ${escapeHtml(it.name)} (${escapeHtml(roomName)})</option>`;
+      }).join('');
+
+      let selectedId = targetItemId || state.selectedItemId || (state.items[0] ? state.items[0].id : null);
+      if (selectedId && state.items.some(it => it.id === selectedId)) {
+        itemSelect.value = selectedId;
+      }
+      currentThermalItemId = itemSelect.value;
+
+      renderCurrentThermalPreview();
+      modal.classList.remove('hidden');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function renderCurrentThermalPreview() {
+      const canvas = document.getElementById('thermalLabelCanvas');
+      const item = state.items.find(it => it.id === currentThermalItemId);
+      if (!canvas || !item) return;
+      drawThermalSticker(canvas, item, currentThermalTemplate);
+    }
+
+    async function shareThermalSticker() {
+      const canvas = document.getElementById('thermalLabelCanvas');
+      const item = state.items.find(it => it.id === currentThermalItemId);
+      if (!canvas || !item) return;
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        const filename = `${item.code || 'TSOG'}_label.png`;
+        const file = new File([blob], filename, { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              title: `Бирка ${item.code}`,
+              text: `${item.name} (${item.code})`,
+              files: [file]
+            });
+            showToast('Отправлено в приложение печати!', 'success');
+          } catch (err) {
+            if (err.name !== 'AbortError') {
+              downloadThermalPng();
+            }
+          }
+        } else {
+          // Если нативное меню поделиться не поддерживается (ПК) - скачиваем напрямую
+          downloadThermalPng();
+          showToast('Наклейка сохранена в Загрузки для Tiny Print', 'success');
+        }
+      }, 'image/png');
+    }
+
+    function downloadThermalPng() {
+      const canvas = document.getElementById('thermalLabelCanvas');
+      const item = state.items.find(it => it.id === currentThermalItemId);
+      if (!canvas || !item) return;
+
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${item.code || 'TSOG'}_label_57mm.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast(`Бирка ${item.code} сохранена в Галерею / Загрузки`, 'success');
+    }
+
+    async function copyThermalToClipboard() {
+      const canvas = document.getElementById('thermalLabelCanvas');
+      if (!canvas) return;
+      try {
+        canvas.toBlob(async (blob) => {
+          if (!blob) return;
+          if (navigator.clipboard && navigator.clipboard.write) {
+            await navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': blob })
+            ]);
+            showToast('Картинка бирки скопирована в буфер обмена', 'success');
+          } else {
+            downloadThermalPng();
+          }
+        }, 'image/png');
+      } catch (err) {
+        downloadThermalPng();
+      }
+    }
+
+    function triggerSystemThermalPrint() {
+      const canvas = document.getElementById('thermalLabelCanvas');
+      const printArea = document.getElementById('thermalPrintArea');
+      if (!canvas || !printArea) return;
+
+      const dataUrl = canvas.toDataURL('image/png');
+      printArea.innerHTML = `<img src="${dataUrl}" style="width:58mm; display:block; margin:0;" alt="Бирка ТСОГ"/>`;
+      window.print();
+    }
+
+    function generateBatchThermalTapeForRoom() {
+      const currentRoomItems = state.items.filter(it => it.room === state.activeRoom);
+      if (currentRoomItems.length === 0) {
+        showToast('В текущем помещении нет позиций для печати', 'error');
+        return;
+      }
+
+      showToast(`Формирование ленты из ${currentRoomItems.length} бирок...`);
+
+      const w = 384;
+      const stickerH = currentThermalTemplate === 'compact' ? 190 : (currentThermalTemplate === 'cable' ? 390 : 260);
+      const totalH = stickerH * currentRoomItems.length;
+
+      const tapeCanvas = document.createElement('canvas');
+      tapeCanvas.width = w;
+      tapeCanvas.height = totalH;
+      const tapeCtx = tapeCanvas.getContext('2d');
+      tapeCtx.fillStyle = '#ffffff';
+      tapeCtx.fillRect(0, 0, w, totalH);
+
+      const singleCanvas = document.createElement('canvas');
+      currentRoomItems.forEach((it, idx) => {
+        drawThermalSticker(singleCanvas, it, currentThermalTemplate);
+        tapeCtx.drawImage(singleCanvas, 0, idx * stickerH);
+      });
+
+      tapeCanvas.toBlob((blob) => {
+        if (!blob) return;
+        const roomShort = ROOMS[state.activeRoom]?.shortName || state.activeRoom;
+        const filename = `Лента_бирок_${roomShort}_57mm.png`;
+        const file = new File([blob], filename, { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({
+            title: `Лента бирок ${roomShort}`,
+            files: [file]
+          }).catch(() => {});
+        } else {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+          showToast(`Лента из ${currentRoomItems.length} бирок скачана`, 'success');
+        }
+      }, 'image/png');
+    }
+
+    // =========================================================================
+    // МОДУЛЬ ЭКСПОРТА В ТАБЛИЦУ EXCEL (.XLS / XML) И CSV (1C)
+    // =========================================================================
+    function getExportItemsList(scope) {
+      const q = (state.searchQuery || '').trim().toLowerCase();
+      switch (scope) {
+        case 'current':
+          return state.items.filter(it => it.room === state.activeRoom);
+        case 'devices':
+          return state.items.filter(it => it.category === 'device');
+        case 'attention':
+          return state.items.filter(it => isItemLowStock(it) || isItemMaintDue(it) || ['repair', 'diag', 'wait_zip'].includes(it.status));
+        case 'filtered':
+          return state.items.filter(item => {
+            const matchesRoom = item.room === state.activeRoom;
+            let matchesCat = true;
+            if (state.categoryFilter === 'attention') {
+              matchesCat = isItemLowStock(item) || isItemMaintDue(item) || ['repair', 'diag', 'wait_zip'].includes(item.status);
+            } else if (state.categoryFilter !== 'all') {
+              matchesCat = item.category === state.categoryFilter;
+            }
+            const matchesQuery = q.length === 0 ||
+              item.name.toLowerCase().includes(q) ||
+              (item.code && item.code.toLowerCase().includes(q)) ||
+              (item.serial && item.serial.toLowerCase().includes(q)) ||
+              (item.unitOrigin && item.unitOrigin.toLowerCase().includes(q));
+            return matchesRoom && matchesCat && matchesQuery;
+          });
+        case 'all':
+        default:
+          return state.items;
+      }
+    }
+
+    function openExcelExportModal() {
+      const modal = document.getElementById('excelExportModal');
+      if (!modal) return;
+      updateExcelExportModalUI();
+      modal.classList.remove('hidden');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function updateExcelExportModalUI() {
+      const scopeSel = document.getElementById('excelExportScopeSelect');
+      const scope = scopeSel ? scopeSel.value : 'all';
+      const itemsList = getExportItemsList(scope);
+
+      const countLbl = document.getElementById('excelExportCountLabel');
+      const authorLbl = document.getElementById('excelExportAuthorLabel');
+
+      if (countLbl) countLbl.textContent = `${itemsList.length} позиций`;
+      if (authorLbl) authorLbl.textContent = state.activeUserName || 'Николай (Ст. мастер)';
+    }
+
+    function exportToExcelXml() {
+      const scopeSel = document.getElementById('excelExportScopeSelect');
+      const scope = scopeSel ? scopeSel.value : 'all';
+      const list = getExportItemsList(scope);
+
+      if (list.length === 0) {
+        showToast('Нет позиций для выгрузки в таблицу', 'error');
+        return;
+      }
+
+      showToast(`Формирование Excel таблицы (${list.length} строк)...`);
+
+      const now = nowFormatted();
+      const author = state.activeUserName || 'Николай (Ст. мастер)';
+
+      // XML Spreadsheet 2003 (нативная поддержка всеми версиями MS Excel, LibreOffice, WPS Office)
+      let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" ss:Size="10" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="Title">
+   <Font ss:FontName="Calibri" ss:Size="14" ss:Bold="1" ss:Color="#1B4332"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+  </Style>
+  <Style ss:ID="Meta">
+   <Font ss:FontName="Calibri" ss:Size="9" ss:Italic="1" ss:Color="#555555"/>
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+  </Style>
+  <Style ss:ID="Hdr">
+   <Font ss:FontName="Calibri" ss:Size="10" ss:Bold="1" ss:Color="#FFFFFF"/>
+   <Interior ss:Color="#1B4332" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="Cell">
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellCenter">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellCode">
+   <Font ss:FontName="Consolas" ss:Size="10" ss:Bold="1" ss:Color="#0B3C5D"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellNum">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellAlert">
+   <Interior ss:Color="#FFE5E5" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellRepair">
+   <Interior ss:Color="#FFF3CD" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="Total">
+   <Font ss:FontName="Calibri" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
+   <Interior ss:Color="#E9ECEF" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#000000"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
+   </Borders>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Ведомость ТСОГ">
+  <Table ss:DefaultRowHeight="20">
+   <Column ss:Width="30"/>
+   <Column ss:Width="80"/>
+   <Column ss:Width="250"/>
+   <Column ss:Width="95"/>
+   <Column ss:Width="95"/>
+   <Column ss:Width="110"/>
+   <Column ss:Width="105"/>
+   <Column ss:Width="55"/>
+   <Column ss:Width="45"/>
+   <Column ss:Width="65"/>
+   <Column ss:Width="70"/>
+   <Column ss:Width="60"/>
+   <Column ss:Width="75"/>
+   <Column ss:Width="150"/>
+   <Column ss:Width="130"/>
+   <Column ss:Width="250"/>
+   <Row ss:Height="24">
+    <Cell ss:MergeAcross="15" ss:StyleID="Title"><Data ss:Type="String">ВЕДОМОСТЬ УЧЕТА МАТЕРИАЛЬНЫХ СРЕДСТВ И ЗИП МАСТЕРСКОЙ ТСОГ</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:MergeAcross="15" ss:StyleID="Meta"><Data ss:Type="String">Мастерская ТСОГ (Лида) | Составил: ${escapeHtml(author)} | Дата: ${escapeHtml(now)}</Data></Cell>
+   </Row>
+   <Row ss:Height="5"/>
+   <Row ss:Height="26">
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">№</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Код бирки</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Наименование изделия / узла</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Локация</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Категория</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Серийный / Инв. №</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Состояние</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Остаток</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Ед.</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Мин. порог</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Наработка</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Лимит</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">След. ТО</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Объект / Застава</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Ответственный</Data></Cell>
+    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Техническое состояние / Примечание</Data></Cell>
+   </Row>`;
+
+      list.forEach((it, idx) => {
+        const isLow = isItemLowStock(it);
+        const isRep = ['repair', 'diag', 'wait_zip'].includes(it.status);
+        const stylePrefix = isLow ? 'CellAlert' : (isRep ? 'CellRepair' : 'Cell');
+
+        const catLabel = CATEGORIES[it.category]?.label || it.category;
+        const roomLabel = ROOMS[it.room]?.name || it.room;
+        const statusLabel = STATUSES[it.status]?.label || it.status;
+        const resCurStr = Number(it.resMax) > 0 ? it.resCurrent : '—';
+        const resMaxStr = Number(it.resMax) > 0 ? it.resMax : '—';
+        const nextMaintStr = it.nextMaint || '—';
+
+        xml += `
+   <Row ss:Height="20">
+    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="Number">${idx + 1}</Data></Cell>
+    <Cell ss:StyleID="CellCode"><Data ss:Type="String">${escapeHtml(it.code || '')}</Data></Cell>
+    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(it.name || '')}</Data></Cell>
+    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(roomLabel)}</Data></Cell>
+    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(catLabel)}</Data></Cell>
+    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(it.serial || 'Б/Н')}</Data></Cell>
+    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(statusLabel)}</Data></Cell>
+    <Cell ss:StyleID="CellNum"><Data ss:Type="Number">${Number(it.qty) || 0}</Data></Cell>
+    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeHtml(it.unit || 'шт.')}</Data></Cell>
+    <Cell ss:StyleID="CellNum"><Data ss:Type="Number">${Number(it.minQty) || 0}</Data></Cell>
+    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeHtml(resCurStr)}</Data></Cell>
+    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeHtml(resMaxStr)}</Data></Cell>
+    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeHtml(nextMaintStr)}</Data></Cell>
+    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(it.unitOrigin || 'Не указан')}</Data></Cell>
+    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(it.assignee || author)}</Data></Cell>
+    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(it.notes || '')}</Data></Cell>
+   </Row>`;
+      });
+
+      // Итоговая строка
+      const firstDataRow = 5;
+      const lastDataRow = 4 + list.length;
+      xml += `
+   <Row ss:Height="22">
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String">ИТОГО:</Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String">Всего позиций: ${list.length}</Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:StyleID="Total" ss:Formula="=SUM(R${firstDataRow}C8:R${lastDataRow}C8)"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
+   </Row>
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+      const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Ведомость_МС_ТСОГ_${new Date().toISOString().slice(0, 10)}.xls`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast('Таблица Excel (.xls) успешно сформирована', 'success');
+    }
+
+    function exportToCsv() {
+      const scopeSel = document.getElementById('excelExportScopeSelect');
+      const scope = scopeSel ? scopeSel.value : 'all';
+      const list = getExportItemsList(scope);
+
+      if (list.length === 0) {
+        showToast('Нет позиций для выгрузки', 'error');
+        return;
+      }
+
+      const headers = [
+        '№', 'Код бирки', 'Наименование', 'Локация', 'Категория',
+        'Серийный номер', 'Состояние', 'Количество', 'Ед. изм.', 'Мин. остаток',
+        'Наработка', 'Лимит', 'След. ТО', 'Объект / Застава', 'Ответственный', 'Примечания'
+      ];
+
+      const rows = [headers.map(h => `"${h}"`).join(';')];
+
+      list.forEach((it, idx) => {
+        const catLabel = CATEGORIES[it.category]?.label || it.category;
+        const roomLabel = ROOMS[it.room]?.name || it.room;
+        const statusLabel = STATUSES[it.status]?.label || it.status;
+        const resCurStr = Number(it.resMax) > 0 ? it.resCurrent : '';
+        const resMaxStr = Number(it.resMax) > 0 ? it.resMax : '';
+
+        const vals = [
+          idx + 1,
+          it.code || '',
+          it.name || '',
+          roomLabel,
+          catLabel,
+          it.serial || '',
+          statusLabel,
+          it.qty,
+          it.unit || 'шт.',
+          it.minQty || 0,
+          resCurStr,
+          resMaxStr,
+          it.nextMaint || '',
+          it.unitOrigin || '',
+          it.assignee || '',
+          it.notes || ''
+        ];
+        rows.push(vals.map(v => `"${String(v).replace(/"/g, '""')}"`).join(';'));
+      });
+
+      // UTF-8 BOM для автоматического открытия кириллицы в Excel
+      const csvContent = '\uFEFF' + rows.join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Ведомость_ТСОГ_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast('CSV файл сформирован', 'success');
+    }
+
+    async function copyExcelTableToClipboard() {
+      const scopeSel = document.getElementById('excelExportScopeSelect');
+      const scope = scopeSel ? scopeSel.value : 'all';
+      const list = getExportItemsList(scope);
+
+      if (list.length === 0) {
+        showToast('Нет данных для копирования', 'error');
+        return;
+      }
+
+      let html = `<table border="1"><thead><tr>
+        <th>№</th><th>Код</th><th>Наименование</th><th>Локация</th><th>Серийный №</th><th>Статус</th><th>Остаток</th><th>Ед.</th><th>Объект</th><th>Ответственный</th>
+      </tr></thead><tbody>`;
+
+      let tsv = `№	Код	Наименование	Локация	Серийный №	Статус	Остаток	Ед.	Объект	Ответственный
+`;
+
+      list.forEach((it, idx) => {
+        const rName = ROOMS[it.room]?.shortName || it.room;
+        const stLabel = STATUSES[it.status]?.label || it.status;
+        html += `<tr>
+          <td>${idx + 1}</td><td>${escapeHtml(it.code)}</td><td>${escapeHtml(it.name)}</td><td>${escapeHtml(rName)}</td>
+          <td>${escapeHtml(it.serial || '—')}</td><td>${escapeHtml(stLabel)}</td><td>${it.qty}</td><td>${escapeHtml(it.unit)}</td>
+          <td>${escapeHtml(it.unitOrigin || '—')}</td><td>${escapeHtml(it.assignee || '—')}</td>
+        </tr>`;
+        tsv += `${idx + 1}	${it.code}	${it.name}	${rName}	${it.serial || '—'}	${stLabel}	${it.qty}	${it.unit}	${it.unitOrigin || '—'}	${it.assignee || '—'}
+`;
+      });
+
+      html += `</tbody></table>`;
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.write) {
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              'text/html': new Blob([html], { type: 'text/html' }),
+              'text/plain': new Blob([tsv], { type: 'text/plain' })
+            })
+          ]);
+          showToast('Таблица скопирована в буфер (можно вставить в Excel)', 'success');
+        } else {
+          showToast('Буфер обмена недоступен в данном браузере', 'error');
+        }
+      } catch (err) {
+        showToast('Не удалось скопировать в буфер: ' + err.message, 'error');
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       loadState();
       renderAll();
+
+      // --- Слушатели модуля термопечати (Tiny Print) ---
+      const btnThermalTop = document.getElementById('btnOpenThermalModalTop');
+      if (btnThermalTop) {
+        btnThermalTop.addEventListener('click', () => openThermalPrintModal(null));
+      }
+
+      const btnThermalDetail = document.getElementById('btnOpenDetailThermalModal');
+      if (btnThermalDetail) {
+        btnThermalDetail.addEventListener('click', () => openThermalPrintModal(state.selectedItemId));
+      }
+
+      const btnCloseThermal = document.getElementById('btnCloseThermalModal');
+      if (btnCloseThermal) {
+        btnCloseThermal.addEventListener('click', () => {
+          document.getElementById('thermalPrintModal').classList.add('hidden');
+        });
+      }
+
+      const thermalSel = document.getElementById('thermalItemSelect');
+      if (thermalSel) {
+        thermalSel.addEventListener('change', () => {
+          currentThermalItemId = thermalSel.value;
+          renderCurrentThermalPreview();
+        });
+      }
+
+      document.querySelectorAll('.label-tpl-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentThermalTemplate = btn.getAttribute('data-label-template');
+          document.querySelectorAll('.label-tpl-btn').forEach(b => {
+            if (b.getAttribute('data-label-template') === currentThermalTemplate) {
+              b.className = 'label-tpl-btn py-2 px-1.5 rounded-xl border text-xs font-semibold text-center transition bg-purple-600/20 border-purple-500 text-purple-200';
+            } else {
+              b.className = 'label-tpl-btn py-2 px-1.5 rounded-xl border text-xs font-semibold text-center transition bg-slate-950 border-slate-700 text-slate-300 hover:border-slate-600';
+            }
+          });
+          renderCurrentThermalPreview();
+        });
+      });
+
+      const btnShareThermal = document.getElementById('btnShareThermalPng');
+      if (btnShareThermal) {
+        btnShareThermal.addEventListener('click', shareThermalSticker);
+      }
+
+      const btnDlThermal = document.getElementById('btnDownloadThermalPng');
+      if (btnDlThermal) {
+        btnDlThermal.addEventListener('click', downloadThermalPng);
+      }
+
+      const btnCopyThermal = document.getElementById('btnCopyThermalClipboard');
+      if (btnCopyThermal) {
+        btnCopyThermal.addEventListener('click', copyThermalToClipboard);
+      }
+
+      const btnSysPrint = document.getElementById('btnSystemPrintLabel');
+      if (btnSysPrint) {
+        btnSysPrint.addEventListener('click', triggerSystemThermalPrint);
+      }
+
+      const btnBatchTape = document.getElementById('btnBatchPrintRoomTape');
+      if (btnBatchTape) {
+        btnBatchTape.addEventListener('click', generateBatchThermalTapeForRoom);
+      }
+
+      // --- Слушатели модуля экспорта в Excel / Таблицы ---
+      const btnExcelTop = document.getElementById('btnOpenExcelModalTop');
+      if (btnExcelTop) {
+        btnExcelTop.addEventListener('click', openExcelExportModal);
+      }
+
+      const btnCloseExcel = document.getElementById('btnCloseExcelModal');
+      if (btnCloseExcel) {
+        btnCloseExcel.addEventListener('click', () => {
+          document.getElementById('excelExportModal').classList.add('hidden');
+        });
+      }
+
+      const scopeSelect = document.getElementById('excelExportScopeSelect');
+      if (scopeSelect) {
+        scopeSelect.addEventListener('change', updateExcelExportModalUI);
+      }
+
+      const btnDlXls = document.getElementById('btnDownloadExcelXls');
+      if (btnDlXls) {
+        btnDlXls.addEventListener('click', exportToExcelXml);
+      }
+
+      const btnDlCsv = document.getElementById('btnDownloadCsv');
+      if (btnDlCsv) {
+        btnDlCsv.addEventListener('click', exportToCsv);
+      }
+
+      const btnCopyExcel = document.getElementById('btnCopyExcelToClipboard');
+      if (btnCopyExcel) {
+        btnCopyExcel.addEventListener('click', copyExcelTableToClipboard);
+      }
+
 
       document.querySelectorAll('.room-tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -4703,7 +5791,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       }
 
       // Закрытие модальных окон при клике по затемненному фону (backdrop)
-      ['roleModal', 'renameUserModal', 'changePinModal', 'qrScannerModal', 'repairActModal', 'itemFormModal', 'logModal', 'cloudModal', 'itemDetailModal'].forEach(id => {
+      ['roleModal', 'renameUserModal', 'changePinModal', 'qrScannerModal', 'repairActModal', 'itemFormModal', 'logModal', 'cloudModal', 'itemDetailModal', 'thermalPrintModal', 'excelExportModal'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
           el.addEventListener('click', (e) => {
