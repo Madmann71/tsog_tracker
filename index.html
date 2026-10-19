@@ -82,8 +82,8 @@
             <i data-lucide="shield-check" class="w-4 h-4 sm:w-5 sm:h-5"></i>
           </div>
           <div class="min-w-0">
-            <h1 class="text-sm sm:text-base font-bold tracking-tight text-white truncate">Мастерская ТСОГ</h1>
-            <p class="hidden sm:block text-[11px] text-slate-400 truncate">Учет МС, ЗИП, ремонтов и выездов</p>
+            <h1 id="headerAppTitle" class="text-sm sm:text-base font-bold tracking-tight text-white truncate">Мастерская ТСОГ</h1>
+            <p id="headerAppSubtitle" class="hidden sm:block text-[11px] text-slate-400 truncate">Учет МС, ЗИП, ремонтов и выездов</p>
           </div>
         </div>
 
@@ -113,6 +113,11 @@
             <i data-lucide="cloud" class="w-4 h-4 text-sky-400"></i>
             <span class="hidden sm:inline">Облако</span>
           </button>
+
+          <button id="btnOpenAppEditorTop" type="button" class="hidden p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/40 transition flex items-center gap-1 text-xs font-medium" title="Редактор разделов и интерфейса приложения">
+            <i data-lucide="sliders" class="w-4 h-4 text-sky-400"></i>
+            <span class="hidden sm:inline">Редактор</span>
+          </button>
         </div>
       </div>
 
@@ -123,7 +128,7 @@
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
             Локально
           </span>
-          <span class="text-[11px] text-slate-500 truncate hidden xs:inline sm:inline">Лида • ТСОГ</span>
+          <span id="headerAppLocation" class="text-[11px] text-slate-500 truncate hidden xs:inline sm:inline">Лида • ТСОГ</span>
         </div>
 
         <!-- Кнопка выбора роли / ПИН-входа + Кнопка выхода -->
@@ -227,7 +232,7 @@
       <button type="button" data-room-tab="sklad" class="room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-semibold transition">
         <div class="flex items-center gap-1.5 truncate">
           <i data-lucide="package" class="w-4 h-4 shrink-0"></i>
-          <span class="truncate">1. Склад</span>
+          <span id="roomTabLabel-sklad" class="truncate">1. Склад</span>
         </div>
         <span id="count-sklad" class="px-1.5 py-0.5 rounded-full text-[11px] font-mono">0</span>
       </button>
@@ -235,7 +240,7 @@
       <button type="button" data-room-tab="masterskaya" class="room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-semibold transition">
         <div class="flex items-center gap-1.5 truncate">
           <i data-lucide="cpu" class="w-4 h-4 shrink-0"></i>
-          <span class="truncate">2. Мастерская</span>
+          <span id="roomTabLabel-masterskaya" class="truncate">2. Мастерская</span>
         </div>
         <span id="count-masterskaya" class="px-1.5 py-0.5 rounded-full text-[11px] font-mono">0</span>
       </button>
@@ -243,7 +248,7 @@
       <button type="button" data-room-tab="slesarka" class="room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-semibold transition">
         <div class="flex items-center gap-1.5 truncate">
           <i data-lucide="wrench" class="w-4 h-4 shrink-0"></i>
-          <span class="truncate">3. Слесарка</span>
+          <span id="roomTabLabel-slesarka" class="truncate">3. Слесарка</span>
         </div>
         <span id="count-slesarka" class="px-1.5 py-0.5 rounded-full text-[11px] font-mono">0</span>
       </button>
@@ -251,7 +256,7 @@
       <button type="button" data-room-tab="vyezd" class="room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-semibold transition">
         <div class="flex items-center gap-1.5 truncate">
           <i data-lucide="truck" class="w-4 h-4 shrink-0"></i>
-          <span class="truncate">4. На выезде</span>
+          <span id="roomTabLabel-vyezd" class="truncate">4. На выезде</span>
         </div>
         <span id="count-vyezd" class="px-1.5 py-0.5 rounded-full text-[11px] font-mono">0</span>
       </button>
@@ -264,6 +269,10 @@
         <p id="currentRoomSubtitle" class="text-xs text-slate-400 mt-0.5">Нажмите на позицию для открытия подменю, частичного перемещения, списания на ремонт или печати акта.</p>
       </div>
       <div class="flex items-center gap-2 self-stretch sm:self-auto justify-end shrink-0">
+        <button id="btnOpenAppEditorFromRoom" type="button" class="hidden px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/30 font-semibold text-xs flex items-center justify-center gap-1.5 transition" title="Редактировать названия разделов и категорий">
+          <i data-lucide="sliders" class="w-3.5 h-3.5 text-sky-400"></i>
+          <span class="hidden sm:inline">Настроить разделы</span>
+        </button>
         <button id="btnQuickPullTop" type="button" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition" title="Загрузить свежие данные из облака">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
           <span>Обновить</span>
@@ -680,6 +689,11 @@
           <p class="text-[11px] text-slate-400 leading-relaxed">
             Здесь вы можете назначать роли («Мастер» — право вносить любые правки в БД, «Просмотр» — только чтение остатков), менять ПИН-коды и добавлять новых сотрудников.
           </p>
+
+          <button id="btnOpenAppEditorFromRole" type="button" class="w-full py-2.5 px-3 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition" title="Открыть редактор разделов, категорий и шапки">
+            <i data-lucide="sliders" class="w-4 h-4 text-sky-400"></i>
+            <span>Редактор разделов и интерфейса приложения</span>
+          </button>
 
           <div id="editorsPinTable" class="flex flex-col gap-1.5 max-h-48 overflow-y-auto custom-scroll"></div>
 
@@ -1182,7 +1196,244 @@
     </div>
   </div>
 
-    <!-- THERMAL PRINTER / TINY PRINT MODAL -->
+    
+  <!-- APP & SECTION EDITOR MODAL (Редактор названий разделов, категорий и шапки) -->
+  <div id="appEditorModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl w-full max-w-2xl max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-900 sticky top-0 z-20 shrink-0">
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-sky-500/15 border border-sky-500/40 flex items-center justify-center text-sky-400 shrink-0">
+            <i data-lucide="sliders" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-white truncate">Редактор разделов и интерфейса</h3>
+            <p class="text-[11px] text-slate-400">Настройка названий 4 помещений, категорий и шапки сервиса</p>
+          </div>
+        </div>
+        <button id="btnCloseAppEditorModal" type="button" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-4 overflow-y-auto custom-scroll flex flex-col gap-4 text-xs sm:text-sm">
+        
+        <!-- Подсказка для администратора -->
+        <div class="bg-sky-950/40 border border-sky-500/30 rounded-2xl p-3 flex items-start gap-2.5 text-xs text-sky-200">
+          <i data-lucide="info" class="w-4 h-4 text-sky-400 shrink-0 mt-0.5"></i>
+          <div class="leading-relaxed">
+            <strong class="text-white block mb-0.5">Полная персонализация мастерской</strong>
+            Здесь вы можете переименовать любые из 4 помещений под свою специфику (например, «3. Слесарка» переименовать в «3. Аппаратная» или «4. На выезде» в «4. Рубежи и ПогЗ»), изменить категории и название сервиса. Все настройки сразу сохраняются и синхронизируются на все телефоны мастеров.
+          </div>
+        </div>
+
+        <!-- Раздел 1: Названия 4 помещений / локаций -->
+        <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-3.5 flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+            <span class="text-xs font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="layout-grid" class="w-4 h-4 text-emerald-400"></i>
+              Названия 4 помещений (вкладки и разделы мастерской)
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">4 раздела</span>
+          </div>
+
+          <!-- Помещение 1: Sklad -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-200 flex items-center gap-1.5 text-xs">
+                <i data-lucide="package" class="w-3.5 h-3.5 text-emerald-400"></i>
+                Раздел 1 (по умолчанию: Склад)
+              </span>
+              <span class="text-[10px] font-mono text-slate-500">ID: sklad</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label for="editRoomName_sklad" class="block text-[11px] text-slate-400 mb-1">Название вкладки:</label>
+                <input id="editRoomName_sklad" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="1. Склад" />
+              </div>
+              <div>
+                <label for="editRoomShort_sklad" class="block text-[11px] text-slate-400 mb-1">Краткое имя (для бирок):</label>
+                <input id="editRoomShort_sklad" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Склад" />
+              </div>
+            </div>
+            <div>
+              <label for="editRoomTitle_sklad" class="block text-[11px] text-slate-400 mb-1">Заголовок страницы раздела:</label>
+              <input id="editRoomTitle_sklad" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="1. Склад — хранение резерва, ЗИП и материалов" />
+            </div>
+            <div>
+              <label for="editRoomSubtitle_sklad" class="block text-[11px] text-slate-400 mb-1">Описание / подзаголовок раздела:</label>
+              <input id="editRoomSubtitle_sklad" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-emerald-500" placeholder="Хранение запаса комплектующих..." />
+            </div>
+          </div>
+
+          <!-- Помещение 2: Masterskaya -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-200 flex items-center gap-1.5 text-xs">
+                <i data-lucide="cpu" class="w-3.5 h-3.5 text-emerald-400"></i>
+                Раздел 2 (по умолчанию: Мастерская)
+              </span>
+              <span class="text-[10px] font-mono text-slate-500">ID: masterskaya</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label for="editRoomName_masterskaya" class="block text-[11px] text-slate-400 mb-1">Название вкладки:</label>
+                <input id="editRoomName_masterskaya" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="2. Мастерская" />
+              </div>
+              <div>
+                <label for="editRoomShort_masterskaya" class="block text-[11px] text-slate-400 mb-1">Краткое имя (для бирок):</label>
+                <input id="editRoomShort_masterskaya" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Мастерская" />
+              </div>
+            </div>
+            <div>
+              <label for="editRoomTitle_masterskaya" class="block text-[11px] text-slate-400 mb-1">Заголовок страницы раздела:</label>
+              <input id="editRoomTitle_masterskaya" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="2. Мастерская — диагностика, пайка..." />
+            </div>
+            <div>
+              <label for="editRoomSubtitle_masterskaya" class="block text-[11px] text-slate-400 mb-1">Описание / подзаголовок раздела:</label>
+              <input id="editRoomSubtitle_masterskaya" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-emerald-500" placeholder="Приборы в ремонте на рабочем столе..." />
+            </div>
+          </div>
+
+          <!-- Помещение 3: Slesarka -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-200 flex items-center gap-1.5 text-xs">
+                <i data-lucide="wrench" class="w-3.5 h-3.5 text-emerald-400"></i>
+                Раздел 3 (по умолчанию: Слесарка)
+              </span>
+              <span class="text-[10px] font-mono text-slate-500">ID: slesarka</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label for="editRoomName_slesarka" class="block text-[11px] text-slate-400 mb-1">Название вкладки:</label>
+                <input id="editRoomName_slesarka" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="3. Слесарка" />
+              </div>
+              <div>
+                <label for="editRoomShort_slesarka" class="block text-[11px] text-slate-400 mb-1">Краткое имя (для бирок):</label>
+                <input id="editRoomShort_slesarka" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Слесарка" />
+              </div>
+            </div>
+            <div>
+              <label for="editRoomTitle_slesarka" class="block text-[11px] text-slate-400 mb-1">Заголовок страницы раздела:</label>
+              <input id="editRoomTitle_slesarka" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="3. Слесарка — механическая обработка..." />
+            </div>
+            <div>
+              <label for="editRoomSubtitle_slesarka" class="block text-[11px] text-slate-400 mb-1">Описание / подзаголовок раздела:</label>
+              <input id="editRoomSubtitle_slesarka" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-emerald-500" placeholder="Шкафы ШРС/ШК, кронштейны камер..." />
+            </div>
+          </div>
+
+          <!-- Помещение 4: Vyezd -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-200 flex items-center gap-1.5 text-xs">
+                <i data-lucide="truck" class="w-3.5 h-3.5 text-emerald-400"></i>
+                Раздел 4 (по умолчанию: На выезде)
+              </span>
+              <span class="text-[10px] font-mono text-slate-500">ID: vyezd</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label for="editRoomName_vyezd" class="block text-[11px] text-slate-400 mb-1">Название вкладки:</label>
+                <input id="editRoomName_vyezd" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="4. На выезде" />
+              </div>
+              <div>
+                <label for="editRoomShort_vyezd" class="block text-[11px] text-slate-400 mb-1">Краткое имя (для бирок):</label>
+                <input id="editRoomShort_vyezd" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="На выезде" />
+              </div>
+            </div>
+            <div>
+              <label for="editRoomTitle_vyezd" class="block text-[11px] text-slate-400 mb-1">Заголовок страницы раздела:</label>
+              <input id="editRoomTitle_vyezd" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="4. На выезде / ПогЗ — выездной КИП..." />
+            </div>
+            <div>
+              <label for="editRoomSubtitle_vyezd" class="block text-[11px] text-slate-400 mb-1">Описание / подзаголовок раздела:</label>
+              <input id="editRoomSubtitle_vyezd" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-emerald-500" placeholder="Инструмент и приборы, временно выданные..." />
+            </div>
+          </div>
+        </div>
+
+        <!-- Раздел 2: Категории материальных средств -->
+        <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-3.5 flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+            <span class="text-xs font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="tags" class="w-4 h-4 text-sky-400"></i>
+              Названия категорий учета
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">4 категории</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label for="editCatLabel_device" class="block text-[11px] text-slate-400 mb-1">Категория 1 (Приборы ТСОГ):</label>
+              <input id="editCatLabel_device" type="text" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-sky-500" placeholder="Прибор ТСОГ" />
+            </div>
+            <div>
+              <label for="editCatLabel_zip" class="block text-[11px] text-slate-400 mb-1">Категория 2 (ЗИП / Модули):</label>
+              <input id="editCatLabel_zip" type="text" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-sky-500" placeholder="ЗИП / Модуль" />
+            </div>
+            <div>
+              <label for="editCatLabel_consumable" class="block text-[11px] text-slate-400 mb-1">Категория 3 (Расходники / Кабель):</label>
+              <input id="editCatLabel_consumable" type="text" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-sky-500" placeholder="Расходник" />
+            </div>
+            <div>
+              <label for="editCatLabel_tool" class="block text-[11px] text-slate-400 mb-1">Категория 4 (Инструмент / КИП):</label>
+              <input id="editCatLabel_tool" type="text" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-sky-500" placeholder="Инструмент / КИП" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Раздел 3: Заголовки приложения и позывной -->
+        <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-3.5 flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+            <span class="text-xs font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="shield-check" class="w-4 h-4 text-purple-400"></i>
+              Шапка приложения и позывной подразделения
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">Верхняя панель</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label for="editAppTitle" class="block text-[11px] text-slate-400 mb-1">Главный заголовок сервиса:</label>
+              <input id="editAppTitle" type="text" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500" placeholder="Мастерская ТСОГ" />
+            </div>
+            <div>
+              <label for="editAppLocation" class="block text-[11px] text-slate-400 mb-1">Дислокация / Подразделение:</label>
+              <input id="editAppLocation" type="text" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500" placeholder="Лида • ТСОГ" />
+            </div>
+            <div class="sm:col-span-2">
+              <label for="editAppSubtitle" class="block text-[11px] text-slate-400 mb-1">Подзаголовок в шапке:</label>
+              <input id="editAppSubtitle" type="text" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500" placeholder="Учет МС, ЗИП, ремонтов и выездов" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-4 py-3 border-t border-slate-800 bg-slate-900/95 flex items-center justify-between gap-2 shrink-0">
+        <button id="btnResetAppConfigDefault" type="button" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition" title="Восстановить исходные пограничные наименования">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>Сброс по умолчанию</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button id="btnCancelAppEditor" type="button" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+            Отмена
+          </button>
+          <button id="btnSaveAppEditor" type="button" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-emerald-950/50 transition">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>Сохранить и применить</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THERMAL PRINTER / TINY PRINT MODAL -->
   <div id="thermalPrintModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl w-full max-w-lg max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-900 sticky top-0 z-20">
@@ -1544,7 +1795,7 @@ module.exports = QRBitBuffer;
   modules['QRPolynomial'] = (function() {
     var module = { exports: {} };
     var exports = module.exports;
-    var QRMath = require('./QRMath');
+    var QRMath = require('QRMath');
 
 function QRPolynomial(num, shift) {
 	if (num.length === undefined) {
@@ -1617,7 +1868,7 @@ module.exports = QRPolynomial;
   modules['QR8bitByte'] = (function() {
     var module = { exports: {} };
     var exports = module.exports;
-    var QRMode = require('./QRMode');
+    var QRMode = require('QRMode');
 
 function QR8bitByte(data) {
 	this.mode = QRMode.MODE_8BIT_BYTE;
@@ -1646,7 +1897,7 @@ module.exports = QR8bitByte;
   modules['QRRSBlock'] = (function() {
     var module = { exports: {} };
     var exports = module.exports;
-    var QRErrorCorrectLevel = require('./QRErrorCorrectLevel');
+    var QRErrorCorrectLevel = require('QRErrorCorrectLevel');
 
 function QRRSBlock(totalCount, dataCount) {
 	this.totalCount = totalCount;
@@ -1951,10 +2202,10 @@ module.exports = QRRSBlock;
   modules['QRUtil'] = (function() {
     var module = { exports: {} };
     var exports = module.exports;
-    var QRMode = require('./QRMode');
-var QRPolynomial = require('./QRPolynomial');
-var QRMath = require('./QRMath');
-var QRMaskPattern = require('./QRMaskPattern');
+    var QRMode = require('QRMode');
+var QRPolynomial = require('QRPolynomial');
+var QRMath = require('QRMath');
+var QRMaskPattern = require('QRMaskPattern');
 
 var QRUtil = {
 
@@ -2248,11 +2499,11 @@ module.exports = QRUtil;
 // Modified to work in node for this project (and some refactoring)
 //---------------------------------------------------------------------
 
-var QR8bitByte = require('./QR8bitByte');
-var QRUtil = require('./QRUtil');
-var QRPolynomial = require('./QRPolynomial');
-var QRRSBlock = require('./QRRSBlock');
-var QRBitBuffer = require('./QRBitBuffer');
+var QR8bitByte = require('QR8bitByte');
+var QRUtil = require('QRUtil');
+var QRPolynomial = require('QRPolynomial');
+var QRRSBlock = require('QRRSBlock');
+var QRBitBuffer = require('QRBitBuffer');
 
 function QRCode(typeNumber, errorCorrectLevel) {
 	this.typeNumber = typeNumber;
@@ -2733,12 +2984,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
 
 
     // --- Справочники помещений ---
-    const ROOMS = {
+    const DEFAULT_ROOMS = {
       sklad: {
         id: 'sklad',
         name: '1. Склад',
         shortName: 'Склад',
-        title: '1. Склад — резерв приборов, ЗИП, кабель и расходники',
+        title: '1. Склад — хранение резерва, ЗИП и материалов',
         subtitle: 'Хранение запаса комплектующих, бухт кабеля, оптики, БП, АКБ и исправного резерва ТСОГ.'
       },
       masterskaya: {
@@ -2764,12 +3015,120 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
       }
     };
 
-    const CATEGORIES = {
+    const DEFAULT_CATEGORIES = {
       device: { label: 'Прибор ТСОГ', badgeClass: 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' },
       zip: { label: 'ЗИП / Модуль', badgeClass: 'bg-sky-500/15 text-sky-300 border border-sky-500/30' },
       consumable: { label: 'Расходник', badgeClass: 'bg-amber-500/15 text-amber-300 border border-amber-500/30' },
       tool: { label: 'Инструмент / КИП', badgeClass: 'bg-purple-500/15 text-purple-300 border border-purple-500/30' }
     };
+
+    const DEFAULT_APP_CONFIG = {
+      appTitle: 'Мастерская ТСОГ',
+      appSubtitle: 'Учет МС, ЗИП, ремонтов и выездов',
+      appLocation: 'Лида • ТСОГ',
+      rooms: JSON.parse(JSON.stringify(DEFAULT_ROOMS)),
+      categories: {
+        device: { label: 'Прибор ТСОГ' },
+        zip: { label: 'ЗИП / Модуль' },
+        consumable: { label: 'Расходник' },
+        tool: { label: 'Инструмент / КИП' }
+      }
+    };
+
+    // Мутабельные рабочие объекты разделов и категорий
+    let ROOMS = JSON.parse(JSON.stringify(DEFAULT_ROOMS));
+    let CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+
+    function applyAppConfig(cfg) {
+      if (!cfg) return;
+      state.appConfig = state.appConfig || JSON.parse(JSON.stringify(DEFAULT_APP_CONFIG));
+      if (cfg.appTitle) state.appConfig.appTitle = cfg.appTitle;
+      if (cfg.appSubtitle) state.appConfig.appSubtitle = cfg.appSubtitle;
+      if (cfg.appLocation) state.appConfig.appLocation = cfg.appLocation;
+
+      if (cfg.rooms) {
+        for (const k of ['sklad', 'masterskaya', 'slesarka', 'vyezd']) {
+          if (cfg.rooms[k]) {
+            state.appConfig.rooms[k] = {
+              ...DEFAULT_ROOMS[k],
+              ...cfg.rooms[k],
+              id: k
+            };
+            if (ROOMS[k]) {
+              ROOMS[k].name = state.appConfig.rooms[k].name;
+              ROOMS[k].shortName = state.appConfig.rooms[k].shortName;
+              ROOMS[k].title = state.appConfig.rooms[k].title;
+              ROOMS[k].subtitle = state.appConfig.rooms[k].subtitle;
+            }
+          }
+        }
+      }
+
+      if (cfg.categories) {
+        for (const k of ['device', 'zip', 'consumable', 'tool']) {
+          if (cfg.categories[k]) {
+            state.appConfig.categories[k] = {
+              ...state.appConfig.categories[k],
+              ...cfg.categories[k]
+            };
+            if (CATEGORIES[k]) {
+              CATEGORIES[k].label = state.appConfig.categories[k].label;
+            }
+          }
+        }
+      }
+
+      // Обновление DOM шапки
+      const titleEl = document.getElementById('headerAppTitle');
+      if (titleEl) titleEl.textContent = state.appConfig.appTitle;
+      const subtitleEl = document.getElementById('headerAppSubtitle');
+      if (subtitleEl) subtitleEl.textContent = state.appConfig.appSubtitle;
+      const locEl = document.getElementById('headerAppLocation');
+      if (locEl) locEl.textContent = state.appConfig.appLocation;
+      document.title = `Учет МС — ${state.appConfig.appTitle}`;
+
+      // Обновление кнопок комнат
+      for (const k of ['sklad', 'masterskaya', 'slesarka', 'vyezd']) {
+        const rLabel = document.getElementById(`roomTabLabel-${k}`);
+        if (rLabel && ROOMS[k]) rLabel.textContent = ROOMS[k].name;
+        const moveBtn = document.querySelector(`[data-move-to="${k}"] span`);
+        if (moveBtn && ROOMS[k]) moveBtn.textContent = ROOMS[k].name;
+      }
+
+      // Обновление select formRoom
+      const formRoomSel = document.getElementById('formRoom');
+      if (formRoomSel) {
+        const curVal = formRoomSel.value;
+        formRoomSel.innerHTML = `
+          <option value="sklad">${escapeHtml(ROOMS.sklad.name)}</option>
+          <option value="masterskaya">${escapeHtml(ROOMS.masterskaya.name)}</option>
+          <option value="slesarka">${escapeHtml(ROOMS.slesarka.name)}</option>
+          <option value="vyezd">${escapeHtml(ROOMS.vyezd.name)}</option>
+        `;
+        if (curVal) formRoomSel.value = curVal;
+      }
+
+      // Обновление select formCategory
+      const formCatSel = document.getElementById('formCategory');
+      if (formCatSel) {
+        const curVal = formCatSel.value;
+        formCatSel.innerHTML = `
+          <option value="device">${escapeHtml(CATEGORIES.device.label)}</option>
+          <option value="zip">${escapeHtml(CATEGORIES.zip.label)}</option>
+          <option value="consumable">${escapeHtml(CATEGORIES.consumable.label)}</option>
+          <option value="tool">${escapeHtml(CATEGORIES.tool.label)}</option>
+        `;
+        if (curVal) formCatSel.value = curVal;
+      }
+
+      // Обновление кнопок фильтров категорий
+      for (const k of ['device', 'zip', 'consumable', 'tool']) {
+        const catBtn = document.querySelector(`[data-cat-filter="${k}"]`);
+        if (catBtn && CATEGORIES[k]) {
+          catBtn.textContent = CATEGORIES[k].label;
+        }
+      }
+    }
 
     const STATUSES = {
       ok: { label: 'Исправен / В наличии', badgeClass: 'bg-emerald-950 text-emerald-300 border border-emerald-700/50' },
@@ -2996,6 +3355,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
     // --- State ---
     let state = {
       isAuthenticated: false, // ПО УМОЛЧАНИЮ: ЛОКЕД! Если никто не авторизован - данные не показываются
+      appConfig: JSON.parse(JSON.stringify(DEFAULT_APP_CONFIG)),
       activeRoom: 'sklad',
       categoryFilter: 'all',
       searchQuery: '',
@@ -3161,6 +3521,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
           state.items = data.items;
           if (Array.isArray(data.logs)) state.logs = data.logs;
           if (Array.isArray(data.editorsList) && data.editorsList.length > 0) state.editorsList = data.editorsList;
+          if (data.appConfig) applyAppConfig(data.appConfig);
           state.serverRevision = Number(data.version) || (state.serverRevision + 1);
           saveState(false);
           renderAll();
@@ -3188,7 +3549,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
           updatedBy: state.activeUserName,
           items: state.items,
           logs: state.logs,
-          editorsList: state.editorsList
+          editorsList: state.editorsList,
+          appConfig: state.appConfig
         };
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 4000);
@@ -3228,6 +3590,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
           state.serverRevision = parsed.serverRevision || 0;
           state.autoSyncEnabled = parsed.autoSyncEnabled !== false;
           state.lastSelectedMaster = parsed.lastSelectedMaster || 'Николай (Ст. мастер)';
+          if (parsed.appConfig) {
+            applyAppConfig(parsed.appConfig);
+          } else {
+            applyAppConfig(DEFAULT_APP_CONFIG);
+          }
           if (Array.isArray(parsed.editorsList) && parsed.editorsList.length > 0) {
             state.editorsList = parsed.editorsList.map(e => {
               if (typeof e === 'string') {
@@ -3240,10 +3607,12 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
         } else {
           state.items = JSON.parse(JSON.stringify(INITIAL_ITEMS));
           state.logs = JSON.parse(JSON.stringify(INITIAL_LOGS));
+          applyAppConfig(DEFAULT_APP_CONFIG);
         }
       } catch (e) {
         state.items = JSON.parse(JSON.stringify(INITIAL_ITEMS));
         state.logs = JSON.parse(JSON.stringify(INITIAL_LOGS));
+        applyAppConfig(DEFAULT_APP_CONFIG);
       }
 
       // ПРОВЕРКА АКТИВНОЙ СЕССИИ (sessionStorage):
@@ -3273,6 +3642,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
     function saveState(triggerPush = true) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          appConfig: state.appConfig,
           items: state.items,
           logs: state.logs,
           githubToken: state.githubToken,
@@ -3420,6 +3790,11 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
       const roleLabel = document.getElementById('roleHeaderLabel');
       const roleIcon = document.getElementById('roleHeaderIcon');
       const btnRole = document.getElementById('btnOpenRoleModal');
+      const btnEditorTop = document.getElementById('btnOpenAppEditorTop');
+      const btnEditorRoom = document.getElementById('btnOpenAppEditorFromRoom');
+      if (btnEditorTop) btnEditorTop.classList.toggle('hidden', !admin);
+      if (btnEditorRoom) btnEditorRoom.classList.toggle('hidden', !admin);
+
       const pinStatus = document.getElementById('pinModalCurrentStatus');
       const btnSwitchViewer = document.getElementById('btnSwitchToViewerQuick');
       const adminPinSec = document.getElementById('editorProfileSection');
@@ -3641,6 +4016,8 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         const roomKey = btn.getAttribute('data-room-tab');
         const active = roomKey === state.activeRoom;
         const badge = btn.querySelector('span[id^="count-"]');
+        const labelEl = document.getElementById(`roomTabLabel-${roomKey}`) || btn.querySelector('.truncate > span');
+        if (labelEl && ROOMS[roomKey]) labelEl.textContent = ROOMS[roomKey].name;
         if (active) {
           btn.className = 'room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-semibold transition bg-emerald-600 text-white shadow-md shadow-emerald-950/60';
           if (badge) badge.className = 'px-1.5 py-0.5 rounded-full text-[11px] font-mono bg-emerald-800/90 text-emerald-100';
@@ -4263,13 +4640,25 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         showToast('Журнал уже пуст');
         return;
       }
-      if (confirm('Вы уверены, что хотите полностью очистить весь журнал движения? Это действие необратимо.')) {
-        state.logs = [];
-        saveState();
-        renderLogModal();
-        renderAll();
-        showToast('Журнал полностью очищен', 'success');
+      const btn = document.getElementById('btnClearAllLogs');
+      if (!btn.__confirming) {
+        btn.__confirming = true;
+        btn.innerHTML = '<i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-400"></i><span>Точно очистить? (нажмите еще раз)</span>';
+        if (window.lucide) window.lucide.createIcons();
+        showToast('Нажмите кнопку повторно для подтверждения очистки');
+        setTimeout(() => {
+          btn.__confirming = false;
+          btn.innerHTML = '<i data-lucide="trash-2" class="w-3.5 h-3.5"></i><span>Очистить журнал</span>';
+          if (window.lucide) window.lucide.createIcons();
+        }, 4000);
+        return;
       }
+      btn.__confirming = false;
+      state.logs = [];
+      saveState();
+      renderLogModal();
+      renderAll();
+      showToast('Журнал полностью очищен', 'success');
     }
 
     function openItemFormModal(editItem) {
@@ -4667,6 +5056,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
               updatedBy: state.activeUserName,
               version: state.serverRevision || 1,
               editorsList: state.editorsList,
+              appConfig: state.appConfig,
               items: state.items,
               logs: state.logs
             }, null, 2)
@@ -4765,6 +5155,9 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
           state.logs = Array.isArray(parsed.logs) ? parsed.logs : state.logs;
           if (Array.isArray(parsed.editorsList) && parsed.editorsList.length > 0) {
             state.editorsList = parsed.editorsList;
+          }
+          if (parsed.appConfig) {
+            applyAppConfig(parsed.appConfig);
           }
           state.githubGistId = gistId;
           if (token) state.githubToken = token;
@@ -5737,6 +6130,156 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       loadState();
       renderAll();
 
+
+    // =========================================================================
+    // МОДУЛЬ РЕДАКТОРА РАЗДЕЛОВ И ИНТЕРФЕЙСА ПРИЛОЖЕНИЯ
+    // =========================================================================
+    function openAppEditorModal() {
+      if (!isAdmin()) {
+        showToast('Ошибка: редактор разделов доступен только администратору', 'error');
+        return;
+      }
+      const cfg = state.appConfig || DEFAULT_APP_CONFIG;
+
+      // Заполнение шапки
+      const titleInp = document.getElementById('editAppTitle');
+      const subInp = document.getElementById('editAppSubtitle');
+      const locInp = document.getElementById('editAppLocation');
+      if (titleInp) titleInp.value = cfg.appTitle || 'Мастерская ТСОГ';
+      if (subInp) subInp.value = cfg.appSubtitle || 'Учет МС, ЗИП, ремонтов и выездов';
+      if (locInp) locInp.value = cfg.appLocation || 'Лида • ТСОГ';
+
+      // Заполнение 4 помещений
+      for (const k of ['sklad', 'masterskaya', 'slesarka', 'vyezd']) {
+        const r = (cfg.rooms && cfg.rooms[k]) || DEFAULT_ROOMS[k];
+        const nameEl = document.getElementById(`editRoomName_${k}`);
+        const shortEl = document.getElementById(`editRoomShort_${k}`);
+        const titleEl = document.getElementById(`editRoomTitle_${k}`);
+        const subEl = document.getElementById(`editRoomSubtitle_${k}`);
+        if (nameEl) nameEl.value = r.name || '';
+        if (shortEl) shortEl.value = r.shortName || '';
+        if (titleEl) titleEl.value = r.title || '';
+        if (subEl) subEl.value = r.subtitle || '';
+      }
+
+      // Заполнение категорий
+      for (const k of ['device', 'zip', 'consumable', 'tool']) {
+        const c = (cfg.categories && cfg.categories[k]) || DEFAULT_CATEGORIES[k];
+        const catEl = document.getElementById(`editCatLabel_${k}`);
+        if (catEl) catEl.value = c.label || '';
+      }
+
+      document.getElementById('appEditorModal').classList.remove('hidden');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function saveAppEditorModal() {
+      if (!isAdmin()) {
+        showToast('Ошибка: редактирование разделов доступно только администратору', 'error');
+        return;
+      }
+
+      const appTitle = document.getElementById('editAppTitle').value.trim() || 'Мастерская ТСОГ';
+      const appSubtitle = document.getElementById('editAppSubtitle').value.trim() || 'Учет МС, ЗИП, ремонтов и выездов';
+      const appLocation = document.getElementById('editAppLocation').value.trim() || 'Лида • ТСОГ';
+
+      const newRooms = {};
+      for (const k of ['sklad', 'masterskaya', 'slesarka', 'vyezd']) {
+        const name = document.getElementById(`editRoomName_${k}`).value.trim() || DEFAULT_ROOMS[k].name;
+        const shortName = document.getElementById(`editRoomShort_${k}`).value.trim() || DEFAULT_ROOMS[k].shortName;
+        const title = document.getElementById(`editRoomTitle_${k}`).value.trim() || DEFAULT_ROOMS[k].title;
+        const subtitle = document.getElementById(`editRoomSubtitle_${k}`).value.trim() || DEFAULT_ROOMS[k].subtitle;
+        newRooms[k] = { id: k, name, shortName, title, subtitle };
+      }
+
+      const newCategories = {};
+      for (const k of ['device', 'zip', 'consumable', 'tool']) {
+        const label = document.getElementById(`editCatLabel_${k}`).value.trim() || DEFAULT_CATEGORIES[k].label;
+        newCategories[k] = { label };
+      }
+
+      const updatedConfig = {
+        appTitle,
+        appSubtitle,
+        appLocation,
+        rooms: newRooms,
+        categories: newCategories
+      };
+
+      applyAppConfig(updatedConfig);
+      addGlobalLog(`[Редактор] Изменены названия разделов и шапки приложения — ${state.activeUserName}`);
+      saveState(true);
+      renderAll();
+      document.getElementById('appEditorModal').classList.add('hidden');
+      showToast('Настройки разделов сохранены и применены!', 'success');
+    }
+
+    function resetAppConfigToDefault() {
+      if (!isAdmin()) {
+        showToast('Ошибка: сброс настроек доступен только администратору', 'error');
+        return;
+      }
+      const btn = document.getElementById('btnResetAppConfigDefault');
+      if (!btn.__confirming) {
+        btn.__confirming = true;
+        btn.innerHTML = '<i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-400"></i><span>Точно сбросить? Нажмите еще раз</span>';
+        if (window.lucide) window.lucide.createIcons();
+        showToast('Нажмите кнопку повторно для сброса разделов к заводским');
+        setTimeout(() => {
+          btn.__confirming = false;
+          btn.innerHTML = '<i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-amber-400"></i><span>Сброс по умолчанию</span>';
+          if (window.lucide) window.lucide.createIcons();
+        }, 4000);
+        return;
+      }
+      btn.__confirming = false;
+      btn.innerHTML = '<i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-amber-400"></i><span>Сброс по умолчанию</span>';
+      applyAppConfig(DEFAULT_APP_CONFIG);
+      addGlobalLog(`[Редактор] Сброс наименований разделов к заводским настройкам ТСОГ — ${state.activeUserName}`);
+      saveState(true);
+      renderAll();
+      openAppEditorModal();
+      showToast('Восстановлены названия разделов по умолчанию', 'success');
+    }
+
+
+      // --- Слушатели редактора разделов и приложения ---
+      const btnEditorTop = document.getElementById('btnOpenAppEditorTop');
+      if (btnEditorTop) {
+        btnEditorTop.addEventListener('click', openAppEditorModal);
+      }
+      const btnEditorRole = document.getElementById('btnOpenAppEditorFromRole');
+      if (btnEditorRole) {
+        btnEditorRole.addEventListener('click', () => {
+          document.getElementById('roleModal').classList.add('hidden');
+          openAppEditorModal();
+        });
+      }
+      const btnEditorRoom = document.getElementById('btnOpenAppEditorFromRoom');
+      if (btnEditorRoom) {
+        btnEditorRoom.addEventListener('click', openAppEditorModal);
+      }
+      const btnCloseEditor = document.getElementById('btnCloseAppEditorModal');
+      if (btnCloseEditor) {
+        btnCloseEditor.addEventListener('click', () => {
+          document.getElementById('appEditorModal').classList.add('hidden');
+        });
+      }
+      const btnCancelEditor = document.getElementById('btnCancelAppEditor');
+      if (btnCancelEditor) {
+        btnCancelEditor.addEventListener('click', () => {
+          document.getElementById('appEditorModal').classList.add('hidden');
+        });
+      }
+      const btnSaveEditor = document.getElementById('btnSaveAppEditor');
+      if (btnSaveEditor) {
+        btnSaveEditor.addEventListener('click', saveAppEditorModal);
+      }
+      const btnResetEditor = document.getElementById('btnResetAppConfigDefault');
+      if (btnResetEditor) {
+        btnResetEditor.addEventListener('click', resetAppConfigToDefault);
+      }
+
       // --- Слушатели модуля термопечати (Tiny Print) ---
       const btnThermalTop = document.getElementById('btnOpenThermalModalTop');
       if (btnThermalTop) {
@@ -5886,7 +6429,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       }
 
       // Закрытие модальных окон при клике по затемненному фону (backdrop)
-      ['roleModal', 'renameUserModal', 'changePinModal', 'qrScannerModal', 'repairActModal', 'itemFormModal', 'logModal', 'cloudModal', 'itemDetailModal', 'thermalPrintModal', 'excelExportModal'].forEach(id => {
+      ['roleModal', 'renameUserModal', 'changePinModal', 'qrScannerModal', 'repairActModal', 'itemFormModal', 'logModal', 'cloudModal', 'itemDetailModal', 'thermalPrintModal', 'excelExportModal', 'appEditorModal'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
           el.addEventListener('click', (e) => {
@@ -6585,6 +7128,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       document.getElementById('btnExportJson').addEventListener('click', () => {
         const blob = new Blob([JSON.stringify({
           exportedAt: nowFormatted(),
+          appConfig: state.appConfig,
           editorsList: state.editorsList,
           items: state.items,
           logs: state.logs
@@ -6612,6 +7156,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
               state.items = parsed.items;
               state.logs = Array.isArray(parsed.logs) ? parsed.logs : state.logs;
               if (Array.isArray(parsed.editorsList)) state.editorsList = parsed.editorsList;
+              if (parsed.appConfig) applyAppConfig(parsed.appConfig);
               saveState();
               renderAll();
               document.getElementById('cloudModal').classList.add('hidden');
