@@ -101,9 +101,6 @@
           <button id="btnOpenExcelModalTop" type="button" class="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-1 text-xs font-medium" title="Экспорт в Excel (.xls / CSV)">
             <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-400"></i>
             <span class="hidden sm:inline">Excel</span>
-          </button> type="button" class="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1 text-xs font-medium" title="Сканер QR / Поиск по штрихкоду">
-            <i data-lucide="qr-code" class="w-4 h-4 text-emerald-400"></i>
-            <span class="hidden sm:inline">QR</span>
           </button>
 
           <button id="btnOpenLog" type="button" class="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1 text-xs font-medium" title="Журнал движения">
@@ -1338,7 +1335,7 @@
         <div class="flex flex-col gap-2 pt-1">
           <button id="btnDownloadExcelXls" type="button" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/50 transition">
             <i data-lucide="download" class="w-4 h-4"></i>
-            <span>Скачать ведомость Excel (.xls с оформлением)</span>
+            <span>Скачать ведомость Excel (.xlsx)</span>
           </button>
 
           <div class="grid grid-cols-2 gap-2">
@@ -3733,7 +3730,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
             <div class="flex items-start justify-between gap-3">
               ${hasPhoto ? `
                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0 self-start">
-                  <img src="${item.photo}" class="w-full h-full object-cover" alt="Превью" loading="lazy" />
+                  <img src="${escapeHtml(item.photo)}" class="w-full h-full object-cover" alt="Превью" loading="lazy" />
                 </div>
               ` : ''}
               <div class="min-w-0 flex-1">
@@ -3827,8 +3824,9 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
           detailPhotoImg.src = '';
           detailPhotoClick.classList.add('hidden');
         }
-        if (hasCloud) {
-          detailCloudAnchor.href = item.cloudLink;
+        const isSafeCloudLink = /^https?:\/\//i.test(String(item.cloudLink || '').trim());
+        if (hasCloud && isSafeCloudLink) {
+          detailCloudAnchor.href = item.cloudLink.trim();
           detailCloudBox.classList.remove('hidden');
         } else {
           detailCloudAnchor.href = '#';
@@ -5040,12 +5038,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         ctx.font = '11px Inter, sans-serif';
         ctx.fillText(truncateCanvasStr(ROOMS[item.room]?.name || '', 22), 16, 134);
 
-        // Разделитель
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(9, 154);
-        ctx.lineTo(w - 9, 154);
-        ctx.stroke();
+        // Разделитель убран для чистого внешнего вида без горизонтальной полосы
 
         // Нижняя строка реквизитов
         ctx.font = 'bold 11px Inter, sans-serif';
@@ -5304,7 +5297,261 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       if (authorLbl) authorLbl.textContent = state.activeUserName || 'Николай (Ст. мастер)';
     }
 
-    function exportToExcelXml() {
+    // --- Генератор файлов XLSX (OpenXML / ZIP) в чистом JavaScript без зависимостей ---
+    function buildBrowserZip(files) {
+      function crc32(buf) {
+        let table = [];
+        for (let i = 0; i < 256; i++) {
+          let c = i;
+          for (let k = 0; k < 8; k++) {
+            c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+          }
+          table[i] = c;
+        }
+        let crc = -1;
+        for (let i = 0; i < buf.length; i++) {
+          crc = (crc >>> 8) ^ table[(crc ^ buf[i]) & 0xFF];
+        }
+        return (crc ^ (-1)) >>> 0;
+      }
+
+      const encoder = new TextEncoder();
+      let localParts = [];
+      let centralParts = [];
+      let offset = 0;
+
+      for (let file of files) {
+        let nameBytes = encoder.encode(file.path);
+        let dataBytes = file.data instanceof Uint8Array ? file.data : encoder.encode(file.data);
+        let fileCrc = crc32(dataBytes);
+        let size = dataBytes.length;
+
+        // Local header (30 bytes + name)
+        let lh = new Uint8Array(30 + nameBytes.length);
+        let dv = new DataView(lh.buffer);
+        dv.setUint32(0, 0x04034b50, true);
+        dv.setUint16(4, 20, true);
+        dv.setUint16(6, 0x0800, true);
+        dv.setUint16(8, 0, true); // stored
+        dv.setUint16(10, 0, true);
+        dv.setUint16(12, 0, true);
+        dv.setUint32(14, fileCrc, true);
+        dv.setUint32(18, size, true);
+        dv.setUint32(22, size, true);
+        dv.setUint16(26, nameBytes.length, true);
+        dv.setUint16(28, 0, true);
+        lh.set(nameBytes, 30);
+
+        localParts.push(lh, dataBytes);
+
+        // Central header (46 bytes + name)
+        let ch = new Uint8Array(46 + nameBytes.length);
+        let cdv = new DataView(ch.buffer);
+        cdv.setUint32(0, 0x02014b50, true);
+        cdv.setUint16(4, 20, true);
+        cdv.setUint16(6, 20, true);
+        cdv.setUint16(8, 0x0800, true);
+        cdv.setUint16(10, 0, true);
+        cdv.setUint16(12, 0, true);
+        cdv.setUint16(14, 0, true);
+        cdv.setUint32(16, fileCrc, true);
+        cdv.setUint32(20, size, true);
+        cdv.setUint32(24, size, true);
+        cdv.setUint16(28, nameBytes.length, true);
+        cdv.setUint16(30, 0, true);
+        cdv.setUint16(32, 0, true);
+        cdv.setUint16(34, 0, true);
+        cdv.setUint16(36, 0, true);
+        cdv.setUint32(38, 0, true);
+        cdv.setUint32(42, offset, true);
+        ch.set(nameBytes, 46);
+
+        centralParts.push(ch);
+        offset += lh.length + size;
+      }
+
+      let centralDirOffset = offset;
+      let centralDirSize = centralParts.reduce((acc, p) => acc + p.length, 0);
+
+      let eocd = new Uint8Array(22);
+      let edv = new DataView(eocd.buffer);
+      edv.setUint32(0, 0x06054b50, true);
+      edv.setUint16(4, 0, true);
+      edv.setUint16(6, 0, true);
+      edv.setUint16(8, files.length, true);
+      edv.setUint16(10, files.length, true);
+      edv.setUint32(12, centralDirSize, true);
+      edv.setUint32(16, centralDirOffset, true);
+      edv.setUint16(20, 0, true);
+
+      let totalLen = offset + centralDirSize + 22;
+      let result = new Uint8Array(totalLen);
+      let pos = 0;
+      for (let p of [...localParts, ...centralParts, eocd]) {
+        result.set(p, pos);
+        pos += p.length;
+      }
+      return result;
+    }
+
+    function generateBrowserXlsx(title, subtitle, headers, dataRows, totalFormulaColIndex, colWidths) {
+      function escapeXml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function colName(n) {
+        let s = '';
+        while (n >= 0) {
+          s = String.fromCharCode((n % 26) + 65) + s;
+          n = Math.floor(n / 26) - 1;
+        }
+        return s;
+      }
+
+      const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`;
+
+      const relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
+
+      const workbookRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`;
+
+      const workbookXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+    <sheet name="Ведомость ТСОГ" sheetId="1" r:id="rId1"/>
+  </sheets>
+</workbook>`;
+
+      const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="4">
+    <font><sz val="10"/><name val="Calibri"/></font>
+    <font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font>
+    <font><b/><sz val="13"/><color rgb="FF1B4332"/><name val="Calibri"/></font>
+    <font><b/><sz val="10"/><color rgb="FF000000"/><name val="Calibri"/></font>
+  </fonts>
+  <fills count="4">
+    <fill><patternFill patternType="none"/></fill>
+    <fill><patternFill patternType="gray125"/></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FF1B4332"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFE9ECEF"/></patternFill></fill>
+  </fills>
+  <borders count="3">
+    <border><left/><right/><top/><bottom/><diagonal/></border>
+    <border>
+      <left style="thin"><color rgb="FFD0D7DE"/></left>
+      <right style="thin"><color rgb="FFD0D7DE"/></right>
+      <top style="thin"><color rgb="FFD0D7DE"/></top>
+      <bottom style="thin"><color rgb="FFD0D7DE"/></bottom>
+    </border>
+    <border>
+      <top style="thin"><color rgb="FF000000"/></top>
+      <bottom style="double"><color rgb="FF000000"/></bottom>
+    </border>
+  </borders>
+  <cellStyleXfs count="1">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
+  </cellStyleXfs>
+  <cellXfs count="6">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0"/>
+    <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyAlignment="1">
+      <alignment horizontal="center" vertical="center" wrapText="1"/>
+    </xf>
+    <xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+    <xf numFmtId="0" fontId="3" fillId="3" borderId="2" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/>
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyAlignment="1">
+      <alignment horizontal="center" vertical="center"/>
+    </xf>
+  </cellXfs>
+</styleSheet>`;
+
+      let colsXml = '';
+      if (colWidths && colWidths.length > 0) {
+        colsXml = '<cols>' + colWidths.map((w, idx) => `<col min="${idx + 1}" max="${idx + 1}" width="${w}" customWidth="1"/>`).join('') + '</cols>';
+      }
+
+      let rowsXml = [];
+      let r = 1;
+      rowsXml.push(`<row r="${r}" ht="24" customHeight="1"><c r="A${r}" t="inlineStr" s="2"><is><t>${escapeXml(title)}</t></is></c></row>`);
+      r++;
+      rowsXml.push(`<row r="${r}" ht="18" customHeight="1"><c r="A${r}" t="inlineStr" s="3"><is><t>${escapeXml(subtitle)}</t></is></c></row>`);
+      r++;
+      r++;
+
+      let headerCells = headers.map((h, idx) => `<c r="${colName(idx)}${r}" t="inlineStr" s="1"><is><t>${escapeXml(h)}</t></is></c>`).join('');
+      rowsXml.push(`<row r="${r}" ht="26" customHeight="1">${headerCells}</row>`);
+      r++;
+
+      let firstDataRow = r;
+      for (let row of dataRows) {
+        let cells = row.map((val, idx) => {
+          let cRef = `${colName(idx)}${r}`;
+          let styleIdx = (idx === 1 || idx === 0 || idx === 8) ? 5 : 0;
+          if (typeof val === 'number') {
+            return `<c r="${cRef}" t="n" s="${styleIdx}"><v>${val}</v></c>`;
+          } else {
+            return `<c r="${cRef}" t="inlineStr" s="${styleIdx}"><is><t>${escapeXml(val)}</t></is></c>`;
+          }
+        }).join('');
+        rowsXml.push(`<row r="${r}" ht="20" customHeight="1">${cells}</row>`);
+        r++;
+      }
+      let lastDataRow = r - 1;
+
+      if (dataRows.length > 0 && totalFormulaColIndex !== undefined) {
+        let totalCells = headers.map((_, idx) => {
+          let cRef = `${colName(idx)}${r}`;
+          if (idx === 1) {
+            return `<c r="${cRef}" t="inlineStr" s="4"><is><t>ИТОГО:</t></is></c>`;
+          } else if (idx === 2) {
+            return `<c r="${cRef}" t="inlineStr" s="4"><is><t>Всего позиций: ${dataRows.length}</t></is></c>`;
+          } else if (idx === totalFormulaColIndex) {
+            let colLetter = colName(idx);
+            return `<c r="${cRef}" s="4"><f>SUM(${colLetter}${firstDataRow}:${colLetter}${lastDataRow})</f><v>0</v></c>`;
+          } else {
+            return `<c r="${cRef}" t="inlineStr" s="4"><is><t></t></is></c>`;
+          }
+        }).join('');
+        rowsXml.push(`<row r="${r}" ht="22" customHeight="1">${totalCells}</row>`);
+      }
+
+      const sheet1Xml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  ${colsXml}
+  <sheetData>
+    ${rowsXml.join('\n    ')}
+  </sheetData>
+</worksheet>`;
+
+      return buildBrowserZip([
+        { path: "[Content_Types].xml", data: contentTypesXml },
+        { path: "_rels/.rels", data: relsXml },
+        { path: "xl/_rels/workbook.xml.rels", data: workbookRelsXml },
+        { path: "xl/workbook.xml", data: workbookXml },
+        { path: "xl/styles.xml", data: stylesXml },
+        { path: "xl/worksheets/sheet1.xml", data: sheet1Xml }
+      ]);
+    }
+
+    function exportToExcelXlsx() {
       const scopeSel = document.getElementById('excelExportScopeSelect');
       const scope = scopeSel ? scopeSel.value : 'all';
       const list = getExportItemsList(scope);
@@ -5314,220 +5561,68 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         return;
       }
 
-      showToast(`Формирование Excel таблицы (${list.length} строк)...`);
+      showToast(`Формирование Excel (.xlsx) таблицы (${list.length} строк)...`);
 
       const now = nowFormatted();
       const author = state.activeUserName || 'Николай (Ст. мастер)';
+      const headers = [
+        '№', 'Код бирки', 'Наименование изделия / узла', 'Локация', 'Категория',
+        'Серийный / Инв. №', 'Состояние', 'Остаток', 'Ед.', 'Мин. порог',
+        'Наработка', 'Лимит', 'След. ТО', 'Объект / Застава', 'Ответственный', 'Техническое состояние / Примечание'
+      ];
+      const widths = [6, 12, 34, 16, 16, 18, 16, 10, 8, 12, 12, 12, 14, 24, 20, 36];
 
-      // XML Spreadsheet 2003 (нативная поддержка всеми версиями MS Excel, LibreOffice, WPS Office)
-      let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:o="urn:schemas-microsoft-com:office:office"
- xmlns:x="urn:schemas-microsoft-com:office:excel"
- xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:html="http://www.w3.org/TR/REC-html40">
- <Styles>
-  <Style ss:ID="Default" ss:Name="Normal">
-   <Alignment ss:Vertical="Center"/>
-   <Borders/>
-   <Font ss:FontName="Calibri" ss:Size="10" ss:Color="#000000"/>
-  </Style>
-  <Style ss:ID="Title">
-   <Font ss:FontName="Calibri" ss:Size="14" ss:Bold="1" ss:Color="#1B4332"/>
-   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
-  </Style>
-  <Style ss:ID="Meta">
-   <Font ss:FontName="Calibri" ss:Size="9" ss:Italic="1" ss:Color="#555555"/>
-   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
-  </Style>
-  <Style ss:ID="Hdr">
-   <Font ss:FontName="Calibri" ss:Size="10" ss:Bold="1" ss:Color="#FFFFFF"/>
-   <Interior ss:Color="#1B4332" ss:Pattern="Solid"/>
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
-   <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="Cell">
-   <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="CellCenter">
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-   <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="CellCode">
-   <Font ss:FontName="Consolas" ss:Size="10" ss:Bold="1" ss:Color="#0B3C5D"/>
-   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-   <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="CellNum">
-   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
-   <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="CellAlert">
-   <Interior ss:Color="#FFE5E5" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="CellRepair">
-   <Interior ss:Color="#FFF3CD" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#D0D7DE"/>
-   </Borders>
-  </Style>
-  <Style ss:ID="Total">
-   <Font ss:FontName="Calibri" ss:Size="10" ss:Bold="1" ss:Color="#000000"/>
-   <Interior ss:Color="#E9ECEF" ss:Pattern="Solid"/>
-   <Borders>
-    <Border ss:Position="Bottom" ss:LineStyle="Double" ss:Weight="3" ss:Color="#000000"/>
-    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#000000"/>
-   </Borders>
-  </Style>
- </Styles>
- <Worksheet ss:Name="Ведомость ТСОГ">
-  <Table ss:DefaultRowHeight="20">
-   <Column ss:Width="30"/>
-   <Column ss:Width="80"/>
-   <Column ss:Width="250"/>
-   <Column ss:Width="95"/>
-   <Column ss:Width="95"/>
-   <Column ss:Width="110"/>
-   <Column ss:Width="105"/>
-   <Column ss:Width="55"/>
-   <Column ss:Width="45"/>
-   <Column ss:Width="65"/>
-   <Column ss:Width="70"/>
-   <Column ss:Width="60"/>
-   <Column ss:Width="75"/>
-   <Column ss:Width="150"/>
-   <Column ss:Width="130"/>
-   <Column ss:Width="250"/>
-   <Row ss:Height="24">
-    <Cell ss:MergeAcross="15" ss:StyleID="Title"><Data ss:Type="String">ВЕДОМОСТЬ УЧЕТА МАТЕРИАЛЬНЫХ СРЕДСТВ И ЗИП МАСТЕРСКОЙ ТСОГ</Data></Cell>
-   </Row>
-   <Row ss:Height="18">
-    <Cell ss:MergeAcross="15" ss:StyleID="Meta"><Data ss:Type="String">Мастерская ТСОГ (Лида) | Составил: ${escapeHtml(author)} | Дата: ${escapeHtml(now)}</Data></Cell>
-   </Row>
-   <Row ss:Height="5"/>
-   <Row ss:Height="26">
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">№</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Код бирки</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Наименование изделия / узла</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Локация</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Категория</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Серийный / Инв. №</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Состояние</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Остаток</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Ед.</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Мин. порог</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Наработка</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Лимит</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">След. ТО</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Объект / Застава</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Ответственный</Data></Cell>
-    <Cell ss:StyleID="Hdr"><Data ss:Type="String">Техническое состояние / Примечание</Data></Cell>
-   </Row>`;
-
-      list.forEach((it, idx) => {
-        const isLow = isItemLowStock(it);
-        const isRep = ['repair', 'diag', 'wait_zip'].includes(it.status);
-        const stylePrefix = isLow ? 'CellAlert' : (isRep ? 'CellRepair' : 'Cell');
-
+      const rows = list.map((it, idx) => {
         const catLabel = CATEGORIES[it.category]?.label || it.category;
         const roomLabel = ROOMS[it.room]?.name || it.room;
         const statusLabel = STATUSES[it.status]?.label || it.status;
-        const resCurStr = Number(it.resMax) > 0 ? it.resCurrent : '—';
-        const resMaxStr = Number(it.resMax) > 0 ? it.resMax : '—';
+        const resCurStr = Number(it.resMax) > 0 ? String(it.resCurrent) : '—';
+        const resMaxStr = Number(it.resMax) > 0 ? String(it.resMax) : '—';
         const nextMaintStr = it.nextMaint || '—';
 
-        xml += `
-   <Row ss:Height="20">
-    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="Number">${idx + 1}</Data></Cell>
-    <Cell ss:StyleID="CellCode"><Data ss:Type="String">${escapeHtml(it.code || '')}</Data></Cell>
-    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(it.name || '')}</Data></Cell>
-    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(roomLabel)}</Data></Cell>
-    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(catLabel)}</Data></Cell>
-    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(it.serial || 'Б/Н')}</Data></Cell>
-    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(statusLabel)}</Data></Cell>
-    <Cell ss:StyleID="CellNum"><Data ss:Type="Number">${Number(it.qty) || 0}</Data></Cell>
-    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeHtml(it.unit || 'шт.')}</Data></Cell>
-    <Cell ss:StyleID="CellNum"><Data ss:Type="Number">${Number(it.minQty) || 0}</Data></Cell>
-    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeHtml(resCurStr)}</Data></Cell>
-    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeHtml(resMaxStr)}</Data></Cell>
-    <Cell ss:StyleID="CellCenter"><Data ss:Type="String">${escapeHtml(nextMaintStr)}</Data></Cell>
-    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(it.unitOrigin || 'Не указан')}</Data></Cell>
-    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(it.assignee || author)}</Data></Cell>
-    <Cell ss:StyleID="${stylePrefix}"><Data ss:Type="String">${escapeHtml(it.notes || '')}</Data></Cell>
-   </Row>`;
+        return [
+          idx + 1,
+          it.code || '',
+          it.name || '',
+          roomLabel,
+          catLabel,
+          it.serial || 'Б/Н',
+          statusLabel,
+          Number(it.qty) || 0,
+          it.unit || 'шт.',
+          Number(it.minQty) || 0,
+          resCurStr,
+          resMaxStr,
+          nextMaintStr,
+          it.unitOrigin || 'Не указан',
+          it.assignee || author,
+          it.notes || ''
+        ];
       });
 
-      // Итоговая строка
-      const firstDataRow = 5;
-      const lastDataRow = 4 + list.length;
-      xml += `
-   <Row ss:Height="22">
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String">ИТОГО:</Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String">Всего позиций: ${list.length}</Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="Total" ss:Formula="=SUM(R${firstDataRow}C8:R${lastDataRow}C8)"><Data ss:Type="Number">0</Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-    <Cell ss:StyleID="Total"><Data ss:Type="String"></Data></Cell>
-   </Row>
-  </Table>
- </Worksheet>
-</Workbook>`;
+      try {
+        const zipBytes = generateBrowserXlsx(
+          'ВЕДОМОСТЬ УЧЕТА МАТЕРИАЛЬНЫХ СРЕДСТВ И ЗИП МАСТЕРСКОЙ ТСОГ',
+          `Мастерская ТСОГ (Лида) | Составил: ${author} | Дата: ${now}`,
+          headers,
+          rows,
+          7, // колонка Остаток для формулы SUM
+          widths
+        );
 
-      const blob = new Blob([xml], { type: 'application/vnd.ms-excel;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Ведомость_МС_ТСОГ_${new Date().toISOString().slice(0, 10)}.xls`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      showToast('Таблица Excel (.xls) успешно сформирована', 'success');
+        const blob = new Blob([zipBytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Ведомость_МС_ТСОГ_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showToast('Таблица Excel (.xlsx) успешно сохранена', 'success');
+      } catch (err) {
+        showToast('Ошибка при формировании таблицы: ' + err.message, 'error');
+      }
     }
 
     function exportToCsv() {
@@ -5727,7 +5822,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
 
       const btnDlXls = document.getElementById('btnDownloadExcelXls');
       if (btnDlXls) {
-        btnDlXls.addEventListener('click', exportToExcelXml);
+        btnDlXls.addEventListener('click', exportToExcelXlsx);
       }
 
       const btnDlCsv = document.getElementById('btnDownloadCsv');
