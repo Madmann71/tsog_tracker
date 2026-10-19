@@ -455,6 +455,32 @@
           </div>
         </div>
 
+                <!-- ФОТО ИЗОБРАЖЕНИЕ ПОЗИЦИИ И ВНЕШНИЕ ССЫЛКИ НА ДИСК -->
+        <div id="detailPhotoContainer" class="hidden bg-slate-950/70 border border-slate-800/90 rounded-2xl p-3 flex flex-col sm:flex-row items-center gap-3">
+          <div class="relative w-32 h-32 sm:w-36 sm:h-36 rounded-xl overflow-hidden bg-slate-900 border border-slate-800 shrink-0 cursor-pointer group" id="detailPhotoClickable" title="Нажмите для увеличения фото">
+            <img id="detailPhotoImg" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" alt="Фото прибора" />
+            <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+              <span class="px-2 py-1 rounded-lg bg-slate-900/90 text-white text-[10px] font-medium flex items-center gap-1 border border-slate-700">
+                <i data-lucide="zoom-in" class="w-3 h-3 text-emerald-400"></i>
+                Увеличить
+              </span>
+            </div>
+          </div>
+          <div class="flex flex-col justify-between self-stretch flex-1 text-xs">
+            <div>
+              <span class="text-[11px] text-slate-400 font-semibold block mb-1">Фотофиксация и внешний вид изделия:</span>
+              <p class="text-slate-300 text-xs leading-relaxed">Фото сохранено в базе мастерской. Нажмите на снимок для осмотра в высоком разрешении.</p>
+            </div>
+            <div id="detailCloudLinkBox" class="mt-2.5 hidden">
+              <a id="detailCloudLinkAnchor" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 text-xs font-semibold transition">
+                <i data-lucide="folder-symlink" class="w-3.5 h-3.5 text-sky-400"></i>
+                <span>Открыть папку на Диске</span>
+                <i data-lucide="external-link" class="w-3 h-3 text-sky-400/80"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
         <!-- 4. ОСНОВНЫЕ ХАРАКТЕРИСТИКИ КАРТОЧКИ -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div class="bg-slate-950/60 border border-slate-800/90 rounded-xl p-2.5">
@@ -918,6 +944,60 @@
           <textarea id="formNotes" rows="3" placeholder="Опишите симптомы неисправности, установленные компоненты, результаты замеров рефлектометром или комплектность..." class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"></textarea>
         </div>
 
+        <!-- ФОТОГРАФИЯ ПОЗИЦИИ (Сжатие на лету на клиенте) -->
+        <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex flex-col gap-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+              <i data-lucide="camera" class="w-4 h-4 text-emerald-400"></i>
+              Фотография позиции (для визуального опознания)
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">Автосжатие ~40 КБ</span>
+          </div>
+
+          <input type="file" id="formPhotoCameraInput" accept="image/*" capture="environment" class="hidden" />
+          <input type="file" id="formPhotoGalleryInput" accept="image/*" class="hidden" />
+          <input type="hidden" id="formPhotoData" />
+
+          <div class="flex items-center gap-3">
+            <div id="formPhotoPreviewContainer" class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center overflow-hidden shrink-0 relative group">
+              <div id="formPhotoPlaceholder" class="flex flex-col items-center justify-center text-slate-500 gap-1 p-1 text-center">
+                <i data-lucide="image" class="w-6 h-6"></i>
+                <span class="text-[10px] leading-tight">Нет фото</span>
+              </div>
+              <img id="formPhotoImg" class="w-full h-full object-cover hidden" alt="Фото позиции" />
+              <button id="btnRemoveFormPhoto" type="button" class="absolute top-1 right-1 p-1 rounded-lg bg-rose-600/90 text-white hidden hover:bg-rose-500 shadow-md transition" title="Удалить фото">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+
+            <div class="flex flex-col gap-1.5 flex-1">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                <button id="btnTriggerCamera" type="button" class="py-2 px-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-xs font-medium flex items-center justify-center gap-1.5 transition">
+                  <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                  <span>С камеры</span>
+                </button>
+                <button id="btnTriggerGallery" type="button" class="py-2 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 transition">
+                  <i data-lucide="image-plus" class="w-3.5 h-3.5"></i>
+                  <span>Из галереи</span>
+                </button>
+              </div>
+              <p class="text-[11px] text-slate-400 leading-tight">
+                Снимок оптимизируется прямо на телефоне и сохраняется в базу для автономной работы без интернета.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ССЫЛКА НА ВНЕШНИЙ ДИСК / ОБЛАКО (Опционально) -->
+        <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex flex-col gap-1.5">
+          <label for="formCloudLink" class="text-xs font-semibold text-sky-300 flex items-center gap-1.5">
+            <i data-lucide="folder-symlink" class="w-4 h-4 text-sky-400"></i>
+            Ссылка на папку с документами / Google Диск (необязательно)
+          </label>
+          <input id="formCloudLink" type="url" placeholder="https://drive.google.com/drive/folders/... или Яндекс.Диск" class="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl font-mono text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500" />
+          <span class="text-[11px] text-slate-400">Для тяжелых заводских PDF-паспортов, альбомов схем ВОЛС, архивов прошивок или оригиналов фото.</span>
+        </div>
+
         <div class="pt-2 flex items-center justify-end gap-2">
           <button id="btnCancelForm" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">Отмена</button>
           <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow-lg shadow-emerald-950/50">Сохранить</button>
@@ -1065,6 +1145,24 @@
             </label>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- LIGHTBOX / FULLSCREEN PHOTO MODAL -->
+  <div id="imageLightboxModal" class="fixed inset-0 z-50 hidden bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-center p-3 sm:p-6">
+    <div class="absolute top-4 right-4 z-10 flex items-center gap-2">
+      <button id="btnCloseLightbox" type="button" class="p-2.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-white shadow-xl transition" title="Закрыть">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+    <div class="max-w-3xl w-full flex flex-col items-center gap-3">
+      <div class="max-h-[78vh] max-w-full overflow-hidden rounded-2xl border border-slate-800 shadow-2xl bg-black flex items-center justify-center">
+        <img id="lightboxImg" class="max-h-[78vh] max-w-full object-contain" alt="Фото позиции" />
+      </div>
+      <div class="text-center px-4">
+        <h4 id="lightboxTitle" class="text-sm sm:text-base font-bold text-white"></h4>
+        <p id="lightboxSubtitle" class="text-xs font-mono text-emerald-400 mt-0.5"></p>
       </div>
     </div>
   </div>
@@ -2502,6 +2600,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
         unitOrigin: 'Резерв отряда',
         assignee: 'Николай (Ст. мастер)',
         notes: 'Новые в упаковке, проверены на стенде. Питание PoE / 12V DC, грозозащита в комплекте.',
+        photo: '',
+        cloudLink: '',
         usedParts: [],
         history: [
           { ts: '2026-10-14 09:15', text: 'Оприходовано на 1. Склад (2 шт.) — Николай (Ст. мастер)' }
@@ -2524,6 +2624,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
         unitOrigin: 'Склад ВОЛС',
         assignee: 'Николай (Ст. мастер)',
         notes: 'Стандартные 60 мм с нержавеющим стержнем для уличных оптических муфт МТОК.',
+        photo: '',
+        cloudLink: '',
         usedParts: [],
         history: [
           { ts: '2026-10-10 11:00', text: 'Пополнение склада: 200 шт.' },
@@ -2547,6 +2649,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
         unitOrigin: 'Резерв ПогЗ',
         assignee: 'Николай (Ст. мастер)',
         notes: 'Осталось 2 шт. (ниже порога 4 шт.). Требуется контрольный подзаряд и заявка на пополнение.',
+        photo: '',
+        cloudLink: '',
         usedParts: [],
         history: [
           { ts: '2026-10-16 16:00', text: 'Выдано 2 шт. на замену для ПогЗ №3' }
@@ -2594,6 +2698,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
         unitOrigin: 'Мастерская / Выездной КИП',
         assignee: 'Николай (Ст. мастер)',
         notes: 'Электроды прошли 2650 сварок из 3000 (88% ресурса — скоро плановая замена электродов ELCT2-20A).',
+        photo: '',
+        cloudLink: '',
         usedParts: [],
         history: [
           { ts: '2026-10-15 18:00', text: 'Возвращен в 2. Мастерская после выезда на линию (+40 сварок)' }
@@ -2616,6 +2722,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
         unitOrigin: 'Пост тех. наблюдения №1',
         assignee: 'Николай (Ст. мастер)',
         notes: 'Замена уплотнителя дверцы, врезка 2 латунных гермовводов MG-20 под бронированный оптический кабель, покраска кронштейна.',
+        photo: '',
+        cloudLink: '',
         usedParts: [],
         history: [
           { ts: '2026-10-15 09:40', text: 'Перемещено: 1. Склад → 3. Слесарка (доработка корпуса)' }
@@ -2638,6 +2746,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
         unitOrigin: 'Слесарка',
         assignee: 'Николай (Ст. мастер)',
         notes: 'Под кабель диаметром 10–14 мм для ввода в распределительные коробки и уличные кожухи.',
+        photo: '',
+        cloudLink: '',
         usedParts: [],
         history: [
           { ts: '2026-10-12 13:10', text: 'Пополнение запаса в 3. Слесарка (18 шт.)' }
@@ -2660,6 +2770,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
         unitOrigin: 'На выезде: ПогЗ №4 «Лида», участок ВОЛС',
         assignee: 'Мастер ВОЛС',
         notes: 'В комплекте компенсационная катушка 500 м SM SC/UPC-SC/APC и оптический тестер.',
+        photo: '',
+        cloudLink: '',
         usedParts: [],
         history: [
           { ts: '2026-10-17 08:30', text: 'Перемещено: 2. Мастерская → 4. На выезде (ПогЗ №4) — Мастер ВОЛС' }
@@ -3397,14 +3509,24 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         const showRoomBadge = q.length > 0 || state.categoryFilter === 'attention';
         const usedPartsCount = Array.isArray(item.usedParts) ? item.usedParts.length : 0;
 
+        const hasPhoto = Boolean(item.photo);
+        const hasCloud = Boolean(item.cloudLink);
+
         return `
           <article data-item-card="${escapeHtml(item.id)}" class="group bg-slate-900/90 hover:bg-slate-900 border ${lowStock ? 'border-rose-500/40' : maintDue ? 'border-purple-500/40' : 'border-slate-800 hover:border-slate-700'} rounded-2xl p-3.5 transition cursor-pointer shadow-sm">
             <div class="flex items-start justify-between gap-3">
+              ${hasPhoto ? `
+                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0 self-start">
+                  <img src="${item.photo}" class="w-full h-full object-cover" alt="Превью" loading="lazy" />
+                </div>
+              ` : ''}
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-1.5 flex-wrap mb-1">
                   <span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-950 text-slate-400 border border-slate-800">${escapeHtml(item.code || 'TSOG')}</span>
                   <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${catInfo.badgeClass}">${catInfo.label}</span>
                   <span class="px-2 py-0.5 rounded-md text-[11px] font-medium ${stInfo.badgeClass}">${stInfo.label}</span>
+                  ${hasPhoto ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 shrink-0"><i data-lucide="camera" class="w-3 h-3"></i>Фото</span>` : ''}
+                  ${hasCloud ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-sky-500/15 text-sky-300 border border-sky-500/30 flex items-center gap-1 shrink-0"><i data-lucide="folder-symlink" class="w-3 h-3"></i>Диск</span>` : ''}
                   ${showRoomBadge ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-mono bg-slate-800 text-emerald-300 border border-slate-700">${escapeHtml(roomInfo.name)}</span>` : ''}
                   ${lowStock ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40">Дефицит!</span>` : ''}
                   ${maintDue ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/40">Требуется ТО!</span>` : ''}
@@ -3469,6 +3591,40 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       document.getElementById('detailAssignee').textContent = item.assignee || 'Не указан';
       document.getElementById('detailMinStock').textContent = Number(item.minQty) > 0 ? `${item.minQty} ${item.unit}` : 'Не задан';
       document.getElementById('detailNotes').textContent = item.notes || 'Дополнительных заметок нет.';
+      
+      // Отображение фото и ссылки на Диск
+      const detailPhotoCont = document.getElementById('detailPhotoContainer');
+      const detailPhotoImg = document.getElementById('detailPhotoImg');
+      const detailPhotoClick = document.getElementById('detailPhotoClickable');
+      const detailCloudBox = document.getElementById('detailCloudLinkBox');
+      const detailCloudAnchor = document.getElementById('detailCloudLinkAnchor');
+
+      const hasPhoto = Boolean(item.photo);
+      const hasCloud = Boolean(item.cloudLink);
+
+      if (hasPhoto || hasCloud) {
+        detailPhotoCont.classList.remove('hidden');
+        if (hasPhoto) {
+          detailPhotoImg.src = item.photo;
+          detailPhotoClick.classList.remove('hidden');
+        } else {
+          detailPhotoImg.src = '';
+          detailPhotoClick.classList.add('hidden');
+        }
+        if (hasCloud) {
+          detailCloudAnchor.href = item.cloudLink;
+          detailCloudBox.classList.remove('hidden');
+        } else {
+          detailCloudAnchor.href = '#';
+          detailCloudBox.classList.add('hidden');
+        }
+      } else {
+        detailPhotoCont.classList.add('hidden');
+        detailPhotoImg.src = '';
+        detailCloudAnchor.href = '#';
+        detailCloudBox.classList.add('hidden');
+      }
+
       document.getElementById('detailDeltaQty').value = 1;
       document.getElementById('detailDeltaReason').value = '';
 
@@ -3927,6 +4083,19 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         document.getElementById('formUnitOrigin').value = editItem.unitOrigin || '';
         document.getElementById('formAssignee').value = editItem.assignee || state.activeUserName;
         document.getElementById('formNotes').value = editItem.notes || '';
+        document.getElementById('formCloudLink').value = editItem.cloudLink || '';
+        document.getElementById('formPhotoData').value = editItem.photo || '';
+        if (editItem.photo) {
+          document.getElementById('formPhotoImg').src = editItem.photo;
+          document.getElementById('formPhotoImg').classList.remove('hidden');
+          document.getElementById('formPhotoPlaceholder').classList.add('hidden');
+          document.getElementById('btnRemoveFormPhoto').classList.remove('hidden');
+        } else {
+          document.getElementById('formPhotoImg').src = '';
+          document.getElementById('formPhotoImg').classList.add('hidden');
+          document.getElementById('formPhotoPlaceholder').classList.remove('hidden');
+          document.getElementById('btnRemoveFormPhoto').classList.add('hidden');
+        }
       } else {
         title.textContent = `Добавить в «${ROOMS[state.activeRoom].name}»`;
         document.getElementById('formItemId').value = '';
@@ -3944,6 +4113,12 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         document.getElementById('formUnitOrigin').value = '';
         document.getElementById('formAssignee').value = state.activeUserName;
         document.getElementById('formNotes').value = '';
+        document.getElementById('formCloudLink').value = '';
+        document.getElementById('formPhotoData').value = '';
+        document.getElementById('formPhotoImg').src = '';
+        document.getElementById('formPhotoImg').classList.add('hidden');
+        document.getElementById('formPhotoPlaceholder').classList.remove('hidden');
+        document.getElementById('btnRemoveFormPhoto').classList.add('hidden');
       }
 
       modal.classList.remove('hidden');
@@ -4423,6 +4598,57 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       }
     }
 
+    
+    // --- Оптимизация и сжатие фото на клиенте (WebP / JPEG ~40-60 КБ) ---
+    async function compressImageFile(file, maxDimension = 720, quality = 0.75) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width;
+            let h = img.height;
+            const scale = Math.min(1, maxDimension / Math.max(w, h));
+            w = Math.round(w * scale);
+            h = Math.round(h * scale);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+
+            let dataUrl = canvas.toDataURL('image/webp', quality);
+            if (!dataUrl || !dataUrl.startsWith('data:image/webp')) {
+              dataUrl = canvas.toDataURL('image/jpeg', quality);
+            }
+            resolve(dataUrl);
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleItemPhotoSelect(file) {
+      if (!file) return;
+      showToast('Сжатие фотографии...');
+      try {
+        const compressedDataUrl = await compressImageFile(file, 720, 0.75);
+        document.getElementById('formPhotoData').value = compressedDataUrl;
+        const img = document.getElementById('formPhotoImg');
+        img.src = compressedDataUrl;
+        img.classList.remove('hidden');
+        document.getElementById('formPhotoPlaceholder').classList.add('hidden');
+        document.getElementById('btnRemoveFormPhoto').classList.remove('hidden');
+        showToast('Фото прикреплено к карточке', 'success');
+      } catch (err) {
+        showToast('Ошибка при обработке снимка: ' + err.message, 'error');
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       loadState();
       renderAll();
@@ -4786,7 +5012,74 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
           if (window.lucide) window.lucide.createIcons();
         });
       }
-document.getElementById('btnStartCameraScan').addEventListener('click', startCameraQrScan);
+      // Слушатели прикрепления фото к позиции
+      const btnCam = document.getElementById('btnTriggerCamera');
+      const btnGal = document.getElementById('btnTriggerGallery');
+      const camInp = document.getElementById('formPhotoCameraInput');
+      const galInp = document.getElementById('formPhotoGalleryInput');
+      const btnRemPhoto = document.getElementById('btnRemoveFormPhoto');
+
+      if (btnCam && camInp) {
+        btnCam.addEventListener('click', () => camInp.click());
+        camInp.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            handleItemPhotoSelect(e.target.files[0]);
+            e.target.value = '';
+          }
+        });
+      }
+
+      if (btnGal && galInp) {
+        btnGal.addEventListener('click', () => galInp.click());
+        galInp.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            handleItemPhotoSelect(e.target.files[0]);
+            e.target.value = '';
+          }
+        });
+      }
+
+      if (btnRemPhoto) {
+        btnRemPhoto.addEventListener('click', () => {
+          document.getElementById('formPhotoData').value = '';
+          const img = document.getElementById('formPhotoImg');
+          img.src = '';
+          img.classList.add('hidden');
+          document.getElementById('formPhotoPlaceholder').classList.remove('hidden');
+          btnRemPhoto.classList.add('hidden');
+          showToast('Фото удалено');
+        });
+      }
+
+      // Лайтбокс для просмотра фото в полный экран
+      const detailPhotoClick = document.getElementById('detailPhotoClickable');
+      const lightboxModal = document.getElementById('imageLightboxModal');
+      const btnCloseLightbox = document.getElementById('btnCloseLightbox');
+
+      if (detailPhotoClick && lightboxModal) {
+        detailPhotoClick.addEventListener('click', () => {
+          const item = state.items.find(i => i.id === state.selectedItemId);
+          if (!item || !item.photo) return;
+          document.getElementById('lightboxImg').src = item.photo;
+          document.getElementById('lightboxTitle').textContent = item.name;
+          document.getElementById('lightboxSubtitle').textContent = `${item.code} • ${item.serial || 'Б/Н'}`;
+          lightboxModal.classList.remove('hidden');
+          if (window.lucide) window.lucide.createIcons();
+        });
+      }
+
+      if (btnCloseLightbox && lightboxModal) {
+        btnCloseLightbox.addEventListener('click', () => {
+          lightboxModal.classList.add('hidden');
+        });
+        lightboxModal.addEventListener('click', (e) => {
+          if (e.target === lightboxModal) {
+            lightboxModal.classList.add('hidden');
+          }
+        });
+      }
+
+      document.getElementById('btnStartCameraScan').addEventListener('click', startCameraQrScan);
       document.getElementById('btnFindByQrCode').addEventListener('click', () => {
         findAndOpenByCode(document.getElementById('manualQrInput').value);
       });
@@ -4817,6 +5110,8 @@ document.getElementById('btnStartCameraScan').addEventListener('click', startCam
         const unitOrigin = document.getElementById('formUnitOrigin').value.trim();
         const assignee = document.getElementById('formAssignee').value.trim();
         const notes = document.getElementById('formNotes').value.trim();
+        const photo = document.getElementById('formPhotoData').value || '';
+        const cloudLink = document.getElementById('formCloudLink').value.trim() || '';
 
         if (!name) {
           showToast('Ошибка: укажите наименование позиции', 'error');
@@ -4845,6 +5140,8 @@ document.getElementById('btnStartCameraScan').addEventListener('click', startCam
             item.unitOrigin = unitOrigin;
             item.assignee = assignee;
             item.notes = notes;
+            item.photo = photo;
+            item.cloudLink = cloudLink;
             item.history = item.history || [];
             if (prevRoom !== room) {
               item.history.unshift({ ts: nowFormatted(), text: `Перемещено: ${ROOMS[prevRoom].name} → ${ROOMS[room].name} — ${state.activeUserName}` });
@@ -4876,6 +5173,8 @@ document.getElementById('btnStartCameraScan').addEventListener('click', startCam
             unitOrigin,
             assignee,
             notes,
+            photo,
+            cloudLink,
             usedParts: [],
             history: [
               { ts: nowFormatted(), text: `Добавлено в «${ROOMS[room].name}» (${qty} ${unit}) — ${state.activeUserName}` }
