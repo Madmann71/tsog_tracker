@@ -1,5 +1,5 @@
 // Service Worker для автономной работы и установки PWA Мастерской ТСОГ (v2 с надежным кэшированием QR и CDN)
-const CACHE_NAME = 'tsog-cache-v2';
+const CACHE_NAME = 'tsog-cache-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
