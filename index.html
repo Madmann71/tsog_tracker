@@ -228,8 +228,8 @@
 
 
     <!-- 4 Location Tabs: 1:Склад, 2:Мастерская, 3:Слесарка + 4:На выезде / ПогЗ -->
-    <section aria-label="Помещения и выезд" class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800">
-      <button type="button" data-room-tab="sklad" class="room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-semibold transition">
+    <section aria-label="Помещения и выезд" class="grid grid-cols-2 sm:grid-cols-5 gap-1.5 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800">
+      <button type="button" data-room-tab="sklad" class="room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2 rounded-xl text-xs font-semibold transition">
         <div class="flex items-center gap-1.5 truncate">
           <i data-lucide="package" class="w-4 h-4 shrink-0"></i>
           <span id="roomTabLabel-sklad" class="truncate">1. Склад</span>
@@ -237,7 +237,7 @@
         <span id="count-sklad" class="px-1.5 py-0.5 rounded-full text-[11px] font-mono">0</span>
       </button>
 
-      <button type="button" data-room-tab="masterskaya" class="room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-semibold transition">
+      <button type="button" data-room-tab="masterskaya" class="room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2 rounded-xl text-xs font-semibold transition">
         <div class="flex items-center gap-1.5 truncate">
           <i data-lucide="cpu" class="w-4 h-4 shrink-0"></i>
           <span id="roomTabLabel-masterskaya" class="truncate">2. Мастерская</span>
@@ -245,7 +245,7 @@
         <span id="count-masterskaya" class="px-1.5 py-0.5 rounded-full text-[11px] font-mono">0</span>
       </button>
 
-      <button type="button" data-room-tab="slesarka" class="room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-semibold transition">
+      <button type="button" data-room-tab="slesarka" class="room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2 rounded-xl text-xs font-semibold transition">
         <div class="flex items-center gap-1.5 truncate">
           <i data-lucide="wrench" class="w-4 h-4 shrink-0"></i>
           <span id="roomTabLabel-slesarka" class="truncate">3. Слесарка</span>
@@ -253,12 +253,20 @@
         <span id="count-slesarka" class="px-1.5 py-0.5 rounded-full text-[11px] font-mono">0</span>
       </button>
 
-      <button type="button" data-room-tab="vyezd" class="room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-semibold transition">
+      <button type="button" data-room-tab="vyezd" class="room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2 rounded-xl text-xs font-semibold transition">
         <div class="flex items-center gap-1.5 truncate">
           <i data-lucide="truck" class="w-4 h-4 shrink-0"></i>
           <span id="roomTabLabel-vyezd" class="truncate">4. На выезде</span>
         </div>
         <span id="count-vyezd" class="px-1.5 py-0.5 rounded-full text-[11px] font-mono">0</span>
+      </button>
+
+      <button type="button" data-room-tab="cable" class="room-tab-btn col-span-2 sm:col-span-1 flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2 rounded-xl text-xs font-semibold transition">
+        <div class="flex items-center gap-1.5 truncate">
+          <i data-lucide="git-commit" class="w-4 h-4 shrink-0 text-amber-400"></i>
+          <span id="roomTabLabel-cable" class="truncate">5. Кабель и трассы</span>
+        </div>
+        <span id="count-cable" class="px-1.5 py-0.5 rounded-full text-[11px] font-mono">0</span>
       </button>
     </section>
 
@@ -339,6 +347,71 @@
       </div>
     </section>
 
+    <!-- Dedicated Cable Section Controls (Shown only on 5. Расход кабеля) -->
+    <div id="cableSpecialSection" class="hidden flex flex-col gap-3">
+      <!-- 1. Быстрый калькулятор метражных меток барабана -->
+      <div class="bg-gradient-to-r from-amber-500/10 via-slate-900/90 to-slate-900 border border-amber-500/30 rounded-2xl p-3 sm:p-4 shadow-lg flex flex-col gap-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+            <i data-lucide="calculator" class="w-4 h-4 text-amber-400"></i>
+            Калькулятор метражных меток кабеля (Начало − Конец)
+          </span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+            Авто-расчет расхода
+          </span>
+        </div>
+        <p class="text-xs text-slate-300">
+          Вбивайте заводские метки с оболочки кабеля. Приложение само посчитает метраж без вычислений в уме.
+        </p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Метка «Начало» (м):</label>
+            <input id="quickCalcStart" type="number" step="any" placeholder="Напр. 130" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl font-mono text-center text-sm text-white focus:outline-none focus:border-amber-500" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Метка «Конец» (м):</label>
+            <input id="quickCalcEnd" type="number" step="any" placeholder="Напр. 110" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl font-mono text-center text-sm text-white focus:outline-none focus:border-amber-500" />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Расход (метраж):</label>
+            <div id="quickCalcResult" class="w-full py-2 px-3 bg-slate-950 border border-amber-500/50 rounded-xl font-mono font-bold text-center text-sm text-amber-300">
+              0 м
+            </div>
+          </div>
+          <div class="flex items-end">
+            <button id="btnQuickCalcApply" type="button" class="w-full py-2 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-amber-950/40 transition">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>Записать расход</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Фильтры по типу кабеля и Заставам (ПогЗ) -->
+      <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between bg-slate-900/60 border border-slate-800 p-2.5 rounded-xl">
+        <div class="flex items-center gap-1.5 overflow-x-auto custom-scroll w-full sm:w-auto pb-1 sm:pb-0">
+          <span class="text-[11px] text-slate-400 shrink-0 font-medium mr-1">Тип:</span>
+          <button type="button" data-cable-group-filter="all" class="cable-grp-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40">Все кабели</button>
+          <button type="button" data-cable-group-filter="power" class="cable-grp-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-950 text-slate-300 border border-slate-800 hover:text-white">⚡ Питание (ПВС/ВВГ)</button>
+          <button type="button" data-cable-group-filter="signal" class="cable-grp-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-950 text-slate-300 border border-slate-800 hover:text-white">📡 Сигнал (ВОЛС/UTP/КСПВ)</button>
+          <button type="button" data-cable-group-filter="accessory" class="cable-grp-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-950 text-slate-300 border border-slate-800 hover:text-white">🛡️ Гофра и монтаж</button>
+        </div>
+        <div class="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+          <span class="text-[11px] text-slate-400 font-medium">ПогЗ:</span>
+          <select id="cablePogzFilterSelect" class="px-2.5 py-1 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-200">
+            <option value="all">Все объекты / ПогЗ</option>
+            <option value="1 погз">ПогЗ №1</option>
+            <option value="2 погз">ПогЗ №2</option>
+            <option value="3 погз">ПогЗ №3</option>
+            <option value="4 погз">ПогЗ №4</option>
+            <option value="5 погз">ПогЗ №5</option>
+            <option value="сервер">Серверная</option>
+            <option value="мастерск">Мастерская</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <!-- Items List Container -->
     <section id="itemsListContainer" class="flex flex-col gap-2.5"></section>
 
@@ -394,22 +467,26 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5" id="detailMoveButtons">
-            <button type="button" data-move-to="sklad" class="move-room-btn py-2 px-2 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-1.5" id="detailMoveButtons">
+            <button type="button" data-move-to="sklad" class="move-room-btn py-2 px-1.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1 transition">
               <i data-lucide="package" class="w-3.5 h-3.5"></i>
               <span>1. Склад</span>
             </button>
-            <button type="button" data-move-to="masterskaya" class="move-room-btn py-2 px-2 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+            <button type="button" data-move-to="masterskaya" class="move-room-btn py-2 px-1.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1 transition">
               <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
               <span>2. Мастерская</span>
             </button>
-            <button type="button" data-move-to="slesarka" class="move-room-btn py-2 px-2 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+            <button type="button" data-move-to="slesarka" class="move-room-btn py-2 px-1.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1 transition">
               <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
               <span>3. Слесарка</span>
             </button>
-            <button type="button" data-move-to="vyezd" class="move-room-btn py-2 px-2 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+            <button type="button" data-move-to="vyezd" class="move-room-btn py-2 px-1.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1 transition">
               <i data-lucide="truck" class="w-3.5 h-3.5"></i>
               <span>4. На выезде</span>
+            </button>
+            <button type="button" data-move-to="cable" class="move-room-btn col-span-2 sm:col-span-1 py-2 px-1.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1 transition">
+              <i data-lucide="git-commit" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span>5. Кабель</span>
             </button>
           </div>
 
@@ -854,6 +931,203 @@
     </div>
   </div>
 
+  
+  <!-- CABLE RUN MODAL (Специализированная форма расхода кабеля, муфт и распиновки) -->
+  <div id="cableRunModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl w-full max-w-xl max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="px-4 py-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-900 sticky top-0 z-20">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+            <i data-lucide="git-commit" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 id="cableModalTitle" class="text-base font-bold text-white">Записать расход кабеля / трассу</h3>
+            <p class="text-[11px] text-slate-400">Метраж, барабаны, распиновка муфт и списание со склада</p>
+          </div>
+        </div>
+        <button id="btnCloseCableModal" type="button" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body Form -->
+      <form id="cableRunForm" class="p-4 overflow-y-auto custom-scroll flex flex-col gap-3.5 text-xs sm:text-sm">
+        <input type="hidden" id="cableFormItemId" />
+
+        <!-- 1. Категория кабеля -->
+        <div>
+          <label class="block text-xs text-slate-400 mb-1 font-medium">1. Группа кабельной продукции / расходников *</label>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button type="button" data-cable-group-choice="power" class="cable-group-choice-btn py-2 px-1.5 rounded-xl border text-xs font-semibold text-center transition bg-amber-500/20 border-amber-500 text-amber-200">
+              ⚡ Питание<br><span class="text-[10px] text-slate-400 font-normal">ПВС, ВВГ, КГ</span>
+            </button>
+            <button type="button" data-cable-group-choice="signal" class="cable-group-choice-btn py-2 px-1.5 rounded-xl border text-xs font-semibold text-center transition bg-slate-950 border-slate-700 text-slate-300 hover:border-slate-600">
+              📡 Сигнал / Данные<br><span class="text-[10px] text-slate-400 font-normal">ВОЛС, UTP, КСПВ</span>
+            </button>
+            <button type="button" data-cable-group-choice="accessory" class="cable-group-choice-btn py-2 px-1.5 rounded-xl border text-xs font-semibold text-center transition bg-slate-950 border-slate-700 text-slate-300 hover:border-slate-600">
+              🛡️ Монтаж / Гофра<br><span class="text-[10px] text-slate-400 font-normal">Гофра ПНД, рукав</span>
+            </button>
+          </div>
+          <input type="hidden" id="cableFormGroup" value="power" />
+        </div>
+
+        <!-- 2. Марка кабеля -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label for="cableFormName" class="text-xs text-slate-400 font-medium">2. Марка кабеля или расходника *</label>
+            <span class="text-[10px] text-slate-500">выберите или введите вручную</span>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <input id="cableFormName" type="text" required placeholder="Напр.: Кабель ПВС 3х1.5 или Оптика ВОЛС 8 волокон" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs sm:text-sm focus:outline-none focus:border-amber-500" />
+            <!-- Быстрые чипы пресетов -->
+            <div id="cablePresetsChips" class="flex flex-wrap gap-1"></div>
+          </div>
+        </div>
+
+        <!-- 3. Объект / Застава (ПогЗ) + Участок трассы -->
+        <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+          <label class="text-xs text-slate-300 font-semibold flex items-center gap-1.5">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-400"></i>
+            3. Объект / Застава / Трасса *
+          </label>
+          <!-- Быстрые кнопки застав -->
+          <div class="flex flex-wrap gap-1">
+            <button type="button" data-pogz-chip="ПогЗ №1" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">1 ПогЗ</button>
+            <button type="button" data-pogz-chip="ПогЗ №2" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">2 ПогЗ</button>
+            <button type="button" data-pogz-chip="ПогЗ №3" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">3 ПогЗ</button>
+            <button type="button" data-pogz-chip="ПогЗ №4" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">4 ПогЗ</button>
+            <button type="button" data-pogz-chip="ПогЗ №5" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">5 ПогЗ</button>
+            <button type="button" data-pogz-chip="Серверная ТСОГ" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Серверная</button>
+            <button type="button" data-pogz-chip="Мастерская" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Мастерская</button>
+          </div>
+          <input id="cableFormOrigin" type="text" required placeholder="Напр.: ПогЗ №3 «Ворняны», рубеж 2, опора 14" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <!-- 4. Барабан / Бухта и Метражные метки (Калькулятор) -->
+        <div class="bg-slate-950/70 border border-amber-500/30 rounded-xl p-3 flex flex-col gap-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
+              <i data-lucide="hash" class="w-3.5 h-3.5 text-amber-400"></i>
+              4. Барабан/Бухта и расчет метража по меткам
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">Автосчет |Начало − Конец|</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+            <div>
+              <label for="cableFormSpool" class="block text-[11px] text-slate-400 mb-1">№ Барабана / Бухты:</label>
+              <input id="cableFormSpool" type="text" placeholder="0501" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg font-mono text-xs text-white placeholder-slate-600 focus:outline-none focus:border-amber-500" />
+            </div>
+            <div>
+              <label for="cableFormMarkStart" class="block text-[11px] text-slate-400 mb-1">Метка «Начало» (м):</label>
+              <input id="cableFormMarkStart" type="number" step="any" placeholder="109" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg font-mono text-center text-xs text-white placeholder-slate-600 focus:outline-none focus:border-amber-500" />
+            </div>
+            <div>
+              <label for="cableFormMarkEnd" class="block text-[11px] text-slate-400 mb-1">Метка «Конец» (м):</label>
+              <input id="cableFormMarkEnd" type="number" step="any" placeholder="88" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg font-mono text-center text-xs text-white placeholder-slate-600 focus:outline-none focus:border-amber-500" />
+            </div>
+            <div>
+              <label for="cableFormQty" class="block text-[11px] text-amber-300 mb-1 font-bold">Итого расход (м) *:</label>
+              <input id="cableFormQty" type="number" step="any" min="0.1" required value="1" class="w-full px-2.5 py-1.5 bg-slate-900 border border-amber-500/70 rounded-lg font-mono text-center text-xs font-bold text-amber-300 focus:outline-none focus:border-amber-400" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Расход сопутствующей гофры / металлорукава -->
+        <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input id="cableCheckConduit" type="checkbox" class="w-4 h-4 rounded text-amber-500 bg-slate-900 border-slate-700 focus:ring-0" />
+            <span class="text-xs text-slate-200 font-semibold flex items-center gap-1.5">
+              <i data-lucide="shield" class="w-3.5 h-3.5 text-sky-400"></i>
+              Трасса проложена в гофре / трубе / металлорукаве
+            </span>
+          </label>
+          <div id="cableConduitInputs" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 border-t border-slate-800/80">
+            <div class="sm:col-span-2">
+              <label for="cableConduitType" class="block text-[11px] text-slate-400 mb-1">Марка гофры / защиты:</label>
+              <select id="cableConduitType" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white">
+                <option value="Гофра ПНД 20мм черная уличная (с протяжкой)">Гофра ПНД 20мм черная уличная (с зондом)</option>
+                <option value="Гофра ПНД 25мм черная уличная (с протяжкой)">Гофра ПНД 25мм черная уличная (с зондом)</option>
+                <option value="Гофра ПВХ 16мм серая">Гофра ПВХ 16мм серая</option>
+                <option value="Гофра ПВХ 20мм серая">Гофра ПВХ 20мм серая</option>
+                <option value="Металлорукав РЗ-ЦХ 20мм">Металлорукав РЗ-ЦХ 20мм</option>
+                <option value="Металлорукав РЗ-ЦХ 25мм в ПВХ изоляции">Металлорукав РЗ-ЦХ 25мм в ПВХ изоляции</option>
+                <option value="Труба ПНД гладкая 25мм">Труба ПНД гладкая 25мм (подземная)</option>
+              </select>
+            </div>
+            <div>
+              <label for="cableConduitQty" class="block text-[11px] text-slate-400 mb-1">Расход гофры (м):</label>
+              <input id="cableConduitQty" type="number" step="any" min="0.1" value="1" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg font-mono text-center text-xs text-white" />
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Распиновка муфты / Цвета жил / Номера волокон (Больше не потеряются!) -->
+        <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-200 font-semibold flex items-center gap-1.5">
+              <i data-lucide="palette" class="w-3.5 h-3.5 text-purple-400"></i>
+              6. Номер муфты / Распиновка жил / Цвета волокон
+            </span>
+            <span class="text-[10px] text-slate-400">сохраняется в паспорте трассы</span>
+          </div>
+          <!-- Быстрые чипы распиновки -->
+          <div class="flex flex-wrap gap-1">
+            <button type="button" data-pinout-preset="Зел-земля, Красный-ноль, Желтый-фаза" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-amber-300">+ Питание 3х1.5 (Зел-земля, Красн-ноль, Желт-фаза)</button>
+            <button type="button" data-pinout-preset="1:серый, 2:черный, 3:натуральный" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-sky-300">+ Оптика (1:серый, 2:черный, 3:натур.)</button>
+            <button type="button" data-pinout-preset="Проходная цвет в цвет" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-slate-300">+ Проходная цвет в цвет</button>
+            <button type="button" data-pinout-preset="Длинный фазный, Короткий земля" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] text-emerald-300">+ Длинный фаза, Короткий земля</button>
+          </div>
+          <textarea id="cableFormPinout" rows="2" placeholder="Напр.: Муфта 0497: Зел - земля, Красный - ноль, Желтый - фаза; 0516 (у муфты): Зел - земля" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs placeholder-slate-600 focus:outline-none focus:border-purple-500"></textarea>
+        </div>
+
+        <!-- 7. Списание с остатка на Складе (1. Склад) -->
+        <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input id="cableCheckDeductWarehouse" type="checkbox" checked class="w-4 h-4 rounded text-emerald-500 bg-slate-900 border-slate-700 focus:ring-0" />
+            <span class="text-xs text-slate-200 font-semibold flex items-center gap-1.5">
+              <i data-lucide="package-minus" class="w-3.5 h-3.5 text-emerald-400"></i>
+              Списать этот метраж с наличия бухты на Складе (1. Склад)
+            </span>
+          </label>
+          <div id="cableDeductWarehouseBox" class="pt-1 border-t border-slate-800/80">
+            <label for="cableSelectWarehouseSpool" class="block text-[11px] text-slate-400 mb-1">Выберите бухту / кабель на складе:</label>
+            <select id="cableSelectWarehouseSpool" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white">
+              <option value="">— Не связывать со складом (только журнал) —</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 8. Ответственный мастер и заметка -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label for="cableFormAssignee" class="block text-[11px] text-slate-400 mb-1">Ответственный мастер:</label>
+            <input id="cableFormAssignee" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white" />
+          </div>
+          <div>
+            <label for="cableFormDate" class="block text-[11px] text-slate-400 mb-1">Дата и время работ:</label>
+            <input id="cableFormDate" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg font-mono text-xs text-white" />
+          </div>
+        </div>
+
+        <div>
+          <label for="cableFormNotes" class="block text-[11px] text-slate-400 mb-1">Примечания (оборудование, зоны комплекса, замеры):</label>
+          <input id="cableFormNotes" type="text" placeholder="Напр.: Линейная часть Ворон: 2я стойка 3й фотоприемник (2й канал-36 зона)" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-600" />
+        </div>
+
+        <!-- Кнопки формы -->
+        <div class="pt-2 flex items-center justify-end gap-2 border-t border-slate-800">
+          <button id="btnCancelCableForm" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">Отмена</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-lg shadow-amber-950/50 flex items-center gap-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>Сохранить в журнал</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- REPAIR ACT PREVIEW MODAL (Готовый акт выполненных работ / дефектовки) -->
   <div id="repairActModal"  class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-2xl w-full max-w-xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
@@ -900,6 +1174,7 @@
               <option value="masterskaya">2. Мастерская</option>
               <option value="slesarka">3. Слесарка</option>
               <option value="vyezd">4. На выезде / ПогЗ</option>
+              <option value="cable">5. Расход кабеля</option>
             </select>
           </div>
 
@@ -1353,6 +1628,35 @@
               <input id="editRoomSubtitle_vyezd" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-emerald-500" placeholder="Инструмент и приборы, временно выданные..." />
             </div>
           </div>
+
+          <!-- Помещение 5: Cable -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-200 flex items-center gap-1.5 text-xs">
+                <i data-lucide="git-commit" class="w-3.5 h-3.5 text-amber-400"></i>
+                Раздел 5 (по умолчанию: Расход кабеля)
+              </span>
+              <span class="text-[10px] font-mono text-slate-500">ID: cable</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label for="editRoomName_cable" class="block text-[11px] text-slate-400 mb-1">Название вкладки:</label>
+                <input id="editRoomName_cable" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="5. Расход кабеля" />
+              </div>
+              <div>
+                <label for="editRoomShort_cable" class="block text-[11px] text-slate-400 mb-1">Краткое имя (для бирок):</label>
+                <input id="editRoomShort_cable" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Кабель" />
+              </div>
+            </div>
+            <div>
+              <label for="editRoomTitle_cable" class="block text-[11px] text-slate-400 mb-1">Заголовок страницы раздела:</label>
+              <input id="editRoomTitle_cable" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="5. Расход кабеля — учет расхода по метражным меткам, барабанам и муфтам" />
+            </div>
+            <div>
+              <label for="editRoomSubtitle_cable" class="block text-[11px] text-slate-400 mb-1">Описание / подзаголовок раздела:</label>
+              <input id="editRoomSubtitle_cable" type="text" class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-emerald-500" placeholder="Журнал расхода силового (ПВС, ВВГ), сигнального кабеля (ВОЛС, UTP, КСПВ), гофры..." />
+            </div>
+          </div>
         </div>
 
         <!-- Раздел 2: Категории материальных средств -->
@@ -1564,8 +1868,9 @@
         <div>
           <label for="excelExportScopeSelect" class="block text-xs text-slate-400 font-medium mb-1.5">1. Объем выгрузки (фильтр данных):</label>
           <select id="excelExportScopeSelect" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs sm:text-sm focus:outline-none focus:border-emerald-500">
-            <option value="all">Вся мастерская (все 4 помещения)</option>
+            <option value="all">Вся мастерская (все разделы и кабели)</option>
             <option value="current">Только текущее открытое помещение</option>
+            <option value="cable">Только расход кабеля и трассы (метражи, муфты)</option>
             <option value="devices">Только приборы и узлы ТСОГ</option>
             <option value="attention">Только требующие внимания (дефицит ЗИП, ТО, ремонт)</option>
             <option value="filtered">Только результаты текущего поиска</option>
@@ -3012,6 +3317,13 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
         shortName: 'На выезде',
         title: '4. На выезде / ПогЗ — выездной КИП и подменный фонд на объектах',
         subtitle: 'Инструмент и приборы, временно выданные на заставы, рубежи или находящиеся в выездной группе.'
+      },
+      cable: {
+        id: 'cable',
+        name: '5. Расход кабеля',
+        shortName: 'Кабель',
+        title: '5. Расход кабеля — учет расхода по метражным меткам, барабанам и муфтам',
+        subtitle: 'Журнал расхода силового (ПВС, ВВГ), сигнального кабеля (ВОЛС, UTP, КСПВ), гофры, калькулятор меток и распиновка муфт.'
       }
     };
 
@@ -3047,7 +3359,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
       if (cfg.appLocation) state.appConfig.appLocation = cfg.appLocation;
 
       if (cfg.rooms) {
-        for (const k of ['sklad', 'masterskaya', 'slesarka', 'vyezd']) {
+        for (const k of ['sklad', 'masterskaya', 'slesarka', 'vyezd', 'cable']) {
           if (cfg.rooms[k]) {
             state.appConfig.rooms[k] = {
               ...DEFAULT_ROOMS[k],
@@ -3088,7 +3400,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
       document.title = `Учет МС — ${state.appConfig.appTitle}`;
 
       // Обновление кнопок комнат
-      for (const k of ['sklad', 'masterskaya', 'slesarka', 'vyezd']) {
+      for (const k of ['sklad', 'masterskaya', 'slesarka', 'vyezd', 'cable']) {
         const rLabel = document.getElementById(`roomTabLabel-${k}`);
         if (rLabel && ROOMS[k]) rLabel.textContent = ROOMS[k].name;
         const moveBtn = document.querySelector(`[data-move-to="${k}"] span`);
@@ -3104,6 +3416,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
           <option value="masterskaya">${escapeHtml(ROOMS.masterskaya.name)}</option>
           <option value="slesarka">${escapeHtml(ROOMS.slesarka.name)}</option>
           <option value="vyezd">${escapeHtml(ROOMS.vyezd.name)}</option>
+          <option value="cable">${escapeHtml(ROOMS.cable ? ROOMS.cable.name : "5. Расход кабеля")}</option>
         `;
         if (curVal) formRoomSel.value = curVal;
       }
@@ -3342,6 +3655,180 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
         history: [
           { ts: '2026-10-17 08:30', text: 'Перемещено: 2. Мастерская → 4. На выезде (ПогЗ №4) — Мастер ВОЛС' }
         ]
+      },
+      {
+        id: 'item-9',
+        code: 'TSOG-009',
+        room: 'cable',
+        category: 'consumable',
+        cableGroup: 'power',
+        name: 'Кабель силовой ПВС 3х1.5 (питание шкафа ШРС и комплекса)',
+        serial: 'Барабан 0501',
+        spoolNum: '0501',
+        markStart: 109,
+        markEnd: 88,
+        qty: 21,
+        unit: 'м',
+        minQty: 0,
+        resCurrent: 0,
+        resMax: 0,
+        nextMaint: '',
+        status: 'ok',
+        unitOrigin: 'ПогЗ №3 «Ворняны», рубеж 2',
+        assignee: 'Николай (Ст. мастер)',
+        pinout: 'Муфта 0497: Зел - земля, Красный - ноль, Желтый - фаза',
+        conduit: 'Гофра ПНД 20мм (21 м)',
+        conduitQty: 21,
+        notes: 'Расход с барабана 0501 на рубеже 2 ПогЗ №3. Метки 109 -> 88. Трасса уложена в гофру ПНД, ввод через гермоввод MG-20.',
+        photo: '',
+        cloudLink: '',
+        usedParts: [],
+        history: [
+          { ts: '2026-10-19 11:03', text: 'Укладка трассы: 21 м с барабана 0501 (метки 109-88) на ПогЗ №3 — Николай (Ст. мастер)' }
+        ]
+      },
+      {
+        id: 'item-10',
+        code: 'TSOG-010',
+        room: 'cable',
+        category: 'consumable',
+        cableGroup: 'signal',
+        name: 'Кабель оптический бронированный ВОЛС (8 волокон, в грунт)',
+        serial: 'Барабан 0505',
+        spoolNum: '0505',
+        markStart: 130,
+        markEnd: 110,
+        qty: 20,
+        unit: 'м',
+        minQty: 0,
+        resCurrent: 0,
+        resMax: 0,
+        nextMaint: '',
+        status: 'ok',
+        unitOrigin: 'ПогЗ №3 «Ворняны», участок муфты 0494',
+        assignee: 'Николай (Ст. мастер)',
+        pinout: 'Муфта 0494: проходная цвет в цвет; Модуль 1 (1:серый, 2:черный, 3:натуральный); 0516 (у муфты): Зел - земля',
+        conduit: 'Гофра ПНД 20мм (20 м)',
+        conduitQty: 20,
+        notes: 'Врезка кабельной вставки 20 м между муфтой 0494 и 0516. Защита сростков гильзами КДЗС 60мм.',
+        photo: '',
+        cloudLink: '',
+        usedParts: [],
+        history: [
+          { ts: '2026-10-19 11:20', text: 'Прокладка вставки ВОЛС 20 м (метки 130-110) на ПогЗ №3 — Николай (Ст. мастер)' }
+        ]
+      },
+      {
+        id: 'item-11',
+        code: 'TSOG-011',
+        room: 'cable',
+        category: 'consumable',
+        cableGroup: 'signal',
+        name: 'Кабель сигнальный КСПВ 4х0.5 (шлейфы комплекса «Ворон»)',
+        serial: 'Бухта КСПВ-4',
+        spoolNum: 'Бухта К-2',
+        markStart: 350,
+        markEnd: 305,
+        qty: 45,
+        unit: 'м',
+        minQty: 0,
+        resCurrent: 0,
+        resMax: 0,
+        nextMaint: '',
+        status: 'ok',
+        unitOrigin: 'ПогЗ №2, левый фланг',
+        assignee: 'Николай (Ст. мастер)',
+        pinout: '2я стойка 3й фотоприемник: 2й канал - 36 зона, 3й канал - 37 зона',
+        conduit: 'Гофра ПНД 16мм (45 м)',
+        conduitQty: 45,
+        notes: 'Подключение фотоприемников сигнализационного комплекса Ворон на ПогЗ №2. Шлейфы заведены в линейный блок БЛ-4.',
+        photo: '',
+        cloudLink: '',
+        usedParts: [],
+        history: [
+          { ts: '2026-10-17 14:10', text: 'Прокладка шлейфов Ворон 45 м на ПогЗ №2 — Николай (Ст. мастер)' }
+        ]
+      },
+      {
+        id: 'item-12',
+        code: 'TSOG-012',
+        room: 'cable',
+        category: 'consumable',
+        cableGroup: 'accessory',
+        name: 'Гофра ПНД 20мм черная уличная с протяжкой (атмосферостойкая)',
+        serial: 'Бухта 100м',
+        spoolNum: 'Бухта Г-1',
+        markStart: '',
+        markEnd: '',
+        qty: 41,
+        unit: 'м',
+        minQty: 0,
+        resCurrent: 0,
+        resMax: 0,
+        nextMaint: '',
+        status: 'ok',
+        unitOrigin: 'ПогЗ №3 «Ворняны», рубеж 2',
+        assignee: 'Николай (Ст. мастер)',
+        pinout: 'Защита трасс питания ПВС (21м) и ВОЛС (20м)',
+        conduit: '',
+        conduitQty: 0,
+        notes: 'Расход гофры для наружной прокладки по опорам и вводам на ПогЗ №3.',
+        photo: '',
+        cloudLink: '',
+        usedParts: [],
+        history: [
+          { ts: '2026-10-19 11:30', text: 'Списано 41 м гофры ПНД 20мм на ПогЗ №3 — Николай (Ст. мастер)' }
+        ]
+      },
+      {
+        id: 'item-13',
+        code: 'TSOG-013',
+        room: 'sklad',
+        category: 'consumable',
+        name: 'Кабель силовой ПВС 3х1.5 (бухта на складе)',
+        serial: 'Бухта 300м (Партия 2026-08)',
+        status: 'ok',
+        qty: 279,
+        unit: 'м',
+        minQty: 50,
+        resCurrent: 0,
+        resMax: 0,
+        nextMaint: '',
+        unitOrigin: 'Склад ТСОГ',
+        assignee: 'Николай (Ст. мастер)',
+        notes: 'Медный гибкий кабель питания приборов ТСОГ. Остаток 279 м (списано 21 м на ПогЗ №3).',
+        photo: '',
+        cloudLink: '',
+        usedParts: [],
+        history: [
+          { ts: '2026-10-10 09:00', text: 'Пополнение склада: 300 м' },
+          { ts: '2026-10-19 11:03', text: 'Списано 21 м на ПогЗ №3 (барабан 0501) — Николай' }
+        ]
+      },
+      {
+        id: 'item-14',
+        code: 'TSOG-014',
+        room: 'sklad',
+        category: 'consumable',
+        name: 'Кабель оптический бронированный ВОЛС 8 волокон (барабан на складе)',
+        serial: 'Барабан ВОЛС-8 (С/Н Б-8819)',
+        status: 'ok',
+        qty: 480,
+        unit: 'м',
+        minQty: 100,
+        resCurrent: 0,
+        resMax: 0,
+        nextMaint: '',
+        unitOrigin: 'Склад ВОЛС',
+        assignee: 'Николай (Ст. мастер)',
+        notes: 'Бронированный стальной лентой кабель для прокладки в грунт и канализацию. Списано 20 м на ПогЗ №3.',
+        photo: '',
+        cloudLink: '',
+        usedParts: [],
+        history: [
+          { ts: '2026-10-05 10:00', text: 'Приход со склада отряда: 500 м' },
+          { ts: '2026-10-19 11:20', text: 'Списано 20 м на ПогЗ №3 (муфта 0494) — Николай' }
+        ]
       }
     ];
 
@@ -3358,6 +3845,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
       appConfig: JSON.parse(JSON.stringify(DEFAULT_APP_CONFIG)),
       activeRoom: 'sklad',
       categoryFilter: 'all',
+      cableGroupFilter: 'all',
+      cablePogzFilter: 'all',
       searchQuery: '',
       selectedItemId: null,
       accessRole: null, // null / 'viewer' / 'editor'
@@ -4002,7 +4491,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
     }
 
     function renderRoomTabs() {
-      const counts = { sklad: 0, masterskaya: 0, slesarka: 0, vyezd: 0 };
+      const counts = { sklad: 0, masterskaya: 0, slesarka: 0, vyezd: 0, cable: 0 };
       state.items.forEach(it => {
         if (counts[it.room] !== undefined) counts[it.room]++;
       });
@@ -4011,6 +4500,8 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       document.getElementById('count-masterskaya').textContent = counts.masterskaya;
       document.getElementById('count-slesarka').textContent = counts.slesarka;
       document.getElementById('count-vyezd').textContent = counts.vyezd;
+      const cntCable = document.getElementById('count-cable');
+      if (cntCable) cntCable.textContent = counts.cable;
 
       document.querySelectorAll('.room-tab-btn').forEach(btn => {
         const roomKey = btn.getAttribute('data-room-tab');
@@ -4018,11 +4509,16 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         const badge = btn.querySelector('span[id^="count-"]');
         const labelEl = document.getElementById(`roomTabLabel-${roomKey}`) || btn.querySelector('.truncate > span');
         if (labelEl && ROOMS[roomKey]) labelEl.textContent = ROOMS[roomKey].name;
+        
+        const isCableBtn = roomKey === 'cable';
+        const colClass = isCableBtn ? 'col-span-2 sm:col-span-1' : '';
+
         if (active) {
-          btn.className = 'room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-semibold transition bg-emerald-600 text-white shadow-md shadow-emerald-950/60';
-          if (badge) badge.className = 'px-1.5 py-0.5 rounded-full text-[11px] font-mono bg-emerald-800/90 text-emerald-100';
+          const bgActive = isCableBtn ? 'bg-amber-600 shadow-amber-950/60' : 'bg-emerald-600 shadow-emerald-950/60';
+          btn.className = `room-tab-btn ${colClass} flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2 rounded-xl text-xs font-semibold transition ${bgActive} text-white shadow-md`;
+          if (badge) badge.className = `px-1.5 py-0.5 rounded-full text-[11px] font-mono ${isCableBtn ? 'bg-amber-800 text-amber-100' : 'bg-emerald-800 text-emerald-100'}`;
         } else {
-          btn.className = 'room-tab-btn flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2.5 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/60';
+          btn.className = `room-tab-btn ${colClass} flex items-center justify-between sm:justify-center gap-1.5 py-2.5 px-2 rounded-xl text-xs font-semibold transition text-slate-400 hover:text-white hover:bg-slate-800/60`;
           if (badge) badge.className = 'px-1.5 py-0.5 rounded-full text-[11px] font-mono bg-slate-800 text-slate-400';
         }
       });
@@ -4030,18 +4526,69 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       const roomMeta = ROOMS[state.activeRoom] || ROOMS.sklad;
       document.getElementById('currentRoomTitle').textContent = roomMeta.title;
       document.getElementById('currentRoomSubtitle').textContent = roomMeta.subtitle;
+
+      // Показ специального блока кабельного калькулятора только в 5 разделе
+      const cableSec = document.getElementById('cableSpecialSection');
+      if (cableSec) cableSec.classList.toggle('hidden', state.activeRoom !== 'cable');
+
+      // Динамическая надпись на главной кнопке добавления
+      const btnAddTop = document.getElementById('btnAddItemTop');
+      if (btnAddTop) {
+        const span = btnAddTop.querySelector('span');
+        if (span) {
+          span.textContent = state.activeRoom === 'cable' ? 'Записать расход кабеля' : 'Добавить в это помещение';
+        }
+      }
     }
 
     function renderStats() {
-      const totalDevices = state.items.filter(i => i.category === 'device').length;
-      const inRepair = state.items.filter(i => ['repair', 'diag', 'wait_zip'].includes(i.status)).length;
-      const lowStock = state.items.filter(isItemLowStock).length;
-      const maintDue = state.items.filter(isItemMaintDue).length;
+      const statCard1Label = document.getElementById('statDevices')?.parentElement?.querySelector('span:first-child');
+      const statCard2Label = document.getElementById('statInRepair')?.parentElement?.querySelector('span:first-child');
+      const statCard3Label = document.getElementById('statLowStock')?.parentElement?.querySelector('span:first-child');
+      const statCard4Label = document.getElementById('statMaintDue')?.parentElement?.querySelector('span:first-child');
 
-      document.getElementById('statDevices').textContent = totalDevices;
-      document.getElementById('statInRepair').textContent = inRepair;
-      document.getElementById('statLowStock').textContent = lowStock;
-      document.getElementById('statMaintDue').textContent = maintDue;
+      if (state.activeRoom === 'cable') {
+        // Кабельная аналитика
+        let powerM = 0;
+        let signalM = 0;
+        let conduitM = 0;
+        const cableItems = state.items.filter(i => i.room === 'cable');
+
+        cableItems.forEach(it => {
+          const q = Number(it.qty) || 0;
+          const grp = it.cableGroup || (/пвс|ввг|кг|шввп|силов|питани/i.test(it.name) ? 'power' : (/гофр|рукав|труб/i.test(it.name) ? 'accessory' : 'signal'));
+          if (grp === 'power') powerM += q;
+          else if (grp === 'accessory') conduitM += q;
+          else signalM += q;
+          if (it.conduitQty) conduitM += Number(it.conduitQty) || 0;
+        });
+
+        if (statCard1Label) statCard1Label.textContent = '⚡ Питание (ПВС/ВВГ)';
+        if (statCard2Label) statCard2Label.textContent = '📡 Сигнал / ВОЛС';
+        if (statCard3Label) statCard3Label.textContent = '🛡️ Гофра и монтаж';
+        if (statCard4Label) statCard4Label.textContent = '📍 Трасс / муфт';
+
+        document.getElementById('statDevices').textContent = (powerM % 1 === 0 ? powerM : powerM.toFixed(1)) + ' м';
+        document.getElementById('statInRepair').textContent = (signalM % 1 === 0 ? signalM : signalM.toFixed(1)) + ' м';
+        document.getElementById('statLowStock').textContent = (conduitM % 1 === 0 ? conduitM : conduitM.toFixed(1)) + ' м';
+        document.getElementById('statMaintDue').textContent = cableItems.length;
+      } else {
+        // Стандартные показатели для помещений 1-4
+        if (statCard1Label) statCard1Label.textContent = 'Приборы ТСОГ';
+        if (statCard2Label) statCard2Label.textContent = 'В ремонте / Диагн.';
+        if (statCard3Label) statCard3Label.textContent = 'Дефицит ЗИП/расх.';
+        if (statCard4Label) statCard4Label.textContent = 'Контроль ТО / КИП';
+
+        const totalDevices = state.items.filter(i => i.category === 'device' && i.room !== 'cable').length;
+        const inRepair = state.items.filter(i => ['repair', 'diag', 'wait_zip'].includes(i.status) && i.room !== 'cable').length;
+        const lowStock = state.items.filter(i => isItemLowStock(i) && i.room !== 'cable').length;
+        const maintDue = state.items.filter(i => isItemMaintDue(i) && i.room !== 'cable').length;
+
+        document.getElementById('statDevices').textContent = totalDevices;
+        document.getElementById('statInRepair').textContent = inRepair;
+        document.getElementById('statLowStock').textContent = lowStock;
+        document.getElementById('statMaintDue').textContent = maintDue;
+      }
     }
 
     function renderCategoryFilters() {
@@ -4064,10 +4611,23 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         const matchesRoom = isGlobalFilter ? true : item.room === state.activeRoom;
 
         let matchesCat = true;
-        if (state.categoryFilter === 'attention') {
-          matchesCat = isItemLowStock(item) || isItemMaintDue(item) || ['repair', 'diag', 'wait_zip'].includes(item.status);
-        } else if (state.categoryFilter !== 'all') {
-          matchesCat = item.category === state.categoryFilter;
+        if (state.activeRoom === 'cable') {
+          // Специальные фильтры для кабельного раздела
+          if (state.cableGroupFilter && state.cableGroupFilter !== 'all') {
+            const grp = item.cableGroup || (/пвс|ввг|кг|шввп|силов|питани/i.test(item.name) ? 'power' : (/гофр|рукав|труб/i.test(item.name) ? 'accessory' : 'signal'));
+            if (grp !== state.cableGroupFilter) matchesCat = false;
+          }
+          if (state.cablePogzFilter && state.cablePogzFilter !== 'all') {
+            const pogzQ = state.cablePogzFilter.toLowerCase();
+            const originStr = String(item.unitOrigin || '').toLowerCase();
+            if (!originStr.includes(pogzQ)) matchesCat = false;
+          }
+        } else {
+          if (state.categoryFilter === 'attention') {
+            matchesCat = isItemLowStock(item) || isItemMaintDue(item) || ['repair', 'diag', 'wait_zip'].includes(item.status);
+          } else if (state.categoryFilter !== 'all') {
+            matchesCat = item.category === state.categoryFilter;
+          }
         }
 
         const matchesQuery = q.length === 0 ||
@@ -4075,6 +4635,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
           (item.code && item.code.toLowerCase().includes(q)) ||
           (item.serial && item.serial.toLowerCase().includes(q)) ||
           (item.unitOrigin && item.unitOrigin.toLowerCase().includes(q)) ||
+          (item.pinout && item.pinout.toLowerCase().includes(q)) ||
           (item.notes && item.notes.toLowerCase().includes(q));
 
         return matchesRoom && matchesCat && matchesQuery;
@@ -4102,8 +4663,17 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         const hasPhoto = Boolean(item.photo);
         const hasCloud = Boolean(item.cloudLink);
 
+        const isCableItem = item.room === 'cable';
+        const hasMarks = item.markStart !== undefined && item.markEnd !== undefined && String(item.markStart) !== '' && String(item.markEnd) !== '';
+        const grp = item.cableGroup || (/пвс|ввг|кг|шввп|силов|питани/i.test(item.name) ? 'power' : (/гофр|рукав|труб/i.test(item.name) ? 'accessory' : 'signal'));
+        const grpBadge = grp === 'power'
+          ? '<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">⚡ Питание</span>'
+          : (grp === 'accessory'
+              ? '<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">🛡️ Гофра</span>'
+              : '<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/30">📡 Сигнал/ВОЛС</span>');
+
         return `
-          <article data-item-card="${escapeHtml(item.id)}" class="group bg-slate-900/90 hover:bg-slate-900 border ${lowStock ? 'border-rose-500/40' : maintDue ? 'border-purple-500/40' : 'border-slate-800 hover:border-slate-700'} rounded-2xl p-3.5 transition cursor-pointer shadow-sm">
+          <article data-item-card="${escapeHtml(item.id)}" class="group bg-slate-900/90 hover:bg-slate-900 border ${isCableItem ? 'border-amber-500/30 hover:border-amber-500/60' : (lowStock ? 'border-rose-500/40' : maintDue ? 'border-purple-500/40' : 'border-slate-800 hover:border-slate-700')} rounded-2xl p-3.5 transition cursor-pointer shadow-sm">
             <div class="flex items-start justify-between gap-3">
               ${hasPhoto ? `
                 <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0 self-start">
@@ -4113,27 +4683,39 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-1.5 flex-wrap mb-1">
                   <span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-950 text-slate-400 border border-slate-800">${escapeHtml(item.code || 'TSOG')}</span>
-                  <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${catInfo.badgeClass}">${catInfo.label}</span>
-                  <span class="px-2 py-0.5 rounded-md text-[11px] font-medium ${stInfo.badgeClass}">${stInfo.label}</span>
+                  ${isCableItem ? grpBadge : `<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold ${catInfo.badgeClass}">${catInfo.label}</span>`}
+                  ${item.spoolNum ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">Барабан: ${escapeHtml(item.spoolNum)}</span>` : ''}
+                  ${hasMarks ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-mono bg-slate-950 text-slate-300 border border-slate-800">Метки: ${escapeHtml(item.markStart)}м → ${escapeHtml(item.markEnd)}м</span>` : ''}
+                  ${item.conduit ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-800 text-sky-300 border border-slate-700 flex items-center gap-1 shrink-0"><i data-lucide="shield" class="w-3 h-3 text-sky-400"></i>${escapeHtml(item.conduit)}</span>` : ''}
                   ${hasPhoto ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 shrink-0"><i data-lucide="camera" class="w-3 h-3"></i>Фото</span>` : ''}
                   ${hasCloud ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-sky-500/15 text-sky-300 border border-sky-500/30 flex items-center gap-1 shrink-0"><i data-lucide="folder-symlink" class="w-3 h-3"></i>Диск</span>` : ''}
-                  ${showRoomBadge ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-mono bg-slate-800 text-emerald-300 border border-slate-700">${escapeHtml(roomInfo.name)}</span>` : ''}
+                  ${showRoomBadge && !isCableItem ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-mono bg-slate-800 text-emerald-300 border border-slate-700">${escapeHtml(roomInfo.name)}</span>` : ''}
                   ${lowStock ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40">Дефицит!</span>` : ''}
                   ${maintDue ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/40">Требуется ТО!</span>` : ''}
                   ${usedPartsCount > 0 ? `<span class="px-2 py-0.5 rounded-md text-[11px] font-medium bg-amber-500/15 text-amber-300 border border-amber-500/30">Акт ЗИП: ${usedPartsCount}</span>` : ''}
                 </div>
                 <h3 class="text-sm sm:text-base font-bold text-white group-hover:text-emerald-300 transition break-words">${escapeHtml(item.name)}</h3>
                 <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-slate-400">
-                  ${item.serial ? `<span class="font-mono text-slate-300">${escapeHtml(item.serial)}</span>` : ''}
-                  ${item.unitOrigin ? `<span>• Объект: <strong class="text-slate-300 font-medium">${escapeHtml(item.unitOrigin)}</strong></span>` : ''}
+                  ${item.serial && !item.spoolNum ? `<span class="font-mono text-slate-300">${escapeHtml(item.serial)}</span>` : ''}
+                  ${item.unitOrigin ? `<span>• Объект / Трасса: <strong class="text-slate-300 font-medium">${escapeHtml(item.unitOrigin)}</strong></span>` : ''}
                   ${Number(item.resMax) > 0 ? `<span class="font-mono text-purple-300">• Ресурс: ${item.resCurrent}/${item.resMax}</span>` : ''}
+                  ${item.assignee ? `<span>• Мастер: <strong class="text-slate-300 font-medium">${escapeHtml(item.assignee)}</strong></span>` : ''}
                 </div>
+                ${item.pinout ? `
+                  <div class="mt-2 p-2 rounded-xl bg-slate-950/90 border border-purple-500/30 text-xs text-purple-200 flex items-start gap-2">
+                    <i data-lucide="palette" class="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5"></i>
+                    <div>
+                      <strong class="text-white block text-[11px]">Муфта / Распиновка жил / Цвета волокон:</strong>
+                      <span class="font-mono text-slate-200 whitespace-pre-wrap">${escapeHtml(item.pinout)}</span>
+                    </div>
+                  </div>
+                ` : ''}
                 ${item.notes ? `<p class="text-xs text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">${escapeHtml(item.notes)}</p>` : ''}
               </div>
 
               <div class="flex flex-col items-end justify-between shrink-0 self-stretch">
-                <div class="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs sm:text-sm font-bold ${lowStock ? 'text-rose-400 border-rose-500/40' : 'text-emerald-400'}">
-                  ${escapeHtml(item.qty)} ${escapeHtml(item.unit)}
+                <div class="px-2.5 py-1 rounded-xl bg-slate-950 border ${isCableItem ? 'border-amber-500/50 text-amber-300 font-bold' : (lowStock ? 'text-rose-400 border-rose-500/40' : 'text-emerald-400')} font-mono text-xs sm:text-sm font-bold">
+                  ${escapeHtml(item.qty)} ${escapeHtml(item.unit || (isCableItem ? 'м' : 'шт.'))}
                 </div>
                 <span class="text-[11px] text-slate-500 group-hover:text-emerald-400 flex items-center gap-1 mt-3">
                   <span>Подменю</span>
@@ -4659,6 +5241,185 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       renderLogModal();
       renderAll();
       showToast('Журнал полностью очищен', 'success');
+    }
+
+    
+    // =========================================================================
+    // МОДУЛЬ УЧЕТА РАСХОДА КАБЕЛЯ, МЕТРАЖНЫХ МЕТОК И РАСПИНОВОК МУФТ
+    // =========================================================================
+    const CABLE_PRESETS = {
+      power: [
+        'Кабель ПВС 3х1.5',
+        'Кабель ПВС 2х1.5',
+        'Кабель ПВС 3х2.5',
+        'Кабель ВВГнг 3х1.5',
+        'Кабель ВВГнг 3х2.5',
+        'Кабель КГ 3х2.5 (гибкий)',
+        'Провод ШВВП 2х0.75'
+      ],
+      signal: [
+        'Кабель оптический ВОЛС бронированный (8 волокон)',
+        'Кабель оптический ВОЛС подвесной с тросом (4 волокна)',
+        'Кабель UTP 4х2 cat 5e Cu уличный с тросом',
+        'Кабель UTP 4х2 cat 5e (внутренний)',
+        'Кабель FTP экранированный cat 5e',
+        'Кабель сигнальный КСПВ 4х0.5',
+        'Кабель сигнальный КСПВ 8х0.5',
+        'Провод ТРП 2х0.5 (телефонный)'
+      ],
+      accessory: [
+        'Гофра ПНД 20мм черная уличная (с протяжкой)',
+        'Гофра ПНД 25мм черная уличная (с протяжкой)',
+        'Гофра ПВХ 16мм серая',
+        'Металлорукав РЗ-ЦХ 20мм',
+        'Муфта оптическая МТОК уличная',
+        'Гильзы КДЗС 60мм',
+        'Стяжки нейлоновые уличные УФ 250мм'
+      ]
+    };
+
+    function updateQuickCalc() {
+      const startInp = document.getElementById('quickCalcStart');
+      const endInp = document.getElementById('quickCalcEnd');
+      const resEl = document.getElementById('quickCalcResult');
+      if (!startInp || !endInp || !resEl) return;
+
+      const s = parseFloat(startInp.value);
+      const e = parseFloat(endInp.value);
+      if (!isNaN(s) && !isNaN(e)) {
+        const diff = Math.abs(s - e);
+        resEl.textContent = `${diff % 1 === 0 ? diff : diff.toFixed(1)} м`;
+      } else {
+        resEl.textContent = '0 м';
+      }
+    }
+
+    function renderCablePresetsChips(group = 'power') {
+      const container = document.getElementById('cablePresetsChips');
+      if (!container) return;
+      const list = CABLE_PRESETS[group] || CABLE_PRESETS.power;
+      container.innerHTML = list.map(name => `
+        <button type="button" data-cable-preset-click="${escapeHtml(name)}" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-200 transition">
+          ${escapeHtml(name)}
+        </button>
+      `).join('');
+
+      container.querySelectorAll('[data-cable-preset-click]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const name = btn.getAttribute('data-cable-preset-click');
+          document.getElementById('cableFormName').value = name;
+        });
+      });
+    }
+
+    function populateWarehouseSpoolsSelect() {
+      const sel = document.getElementById('cableSelectWarehouseSpool');
+      if (!sel) return;
+      const spools = state.items.filter(i => i.room === 'sklad' && (/кабел|провод|пвс|ввг|кг|оптик|волс|utp|кспв|гофр|бухт|барабан/i.test(i.name) || i.unit === 'м'));
+      sel.innerHTML = '<option value="">— Не списывать со склада (только запись в журнал) —</option>' +
+        spools.map(s => `<option value="${escapeHtml(s.id)}">[Склад] ${escapeHtml(s.name)} (ост: ${s.qty} ${escapeHtml(s.unit)})</option>`).join('');
+    }
+
+    function openCableRunModal(editItem = null) {
+      if (isReadOnly()) {
+        showToast('Ошибка: для записи расхода войдите по ПИН-коду мастера', 'error');
+        return;
+      }
+      const modal = document.getElementById('cableRunModal');
+      const title = document.getElementById('cableModalTitle');
+
+      populateWarehouseSpoolsSelect();
+
+      if (editItem) {
+        title.textContent = `Редактировать запись расхода (${editItem.code || ''})`;
+        document.getElementById('cableFormItemId').value = editItem.id;
+        const grp = editItem.cableGroup || (/пвс|ввг|кг|шввп|силов|питани/i.test(editItem.name) ? 'power' : (/гофр|рукав|труб/i.test(editItem.name) ? 'accessory' : 'signal'));
+        document.getElementById('cableFormGroup').value = grp;
+        setCableGroupChoiceUI(grp);
+        document.getElementById('cableFormName').value = editItem.name || '';
+        document.getElementById('cableFormOrigin').value = editItem.unitOrigin || '';
+        document.getElementById('cableFormSpool').value = editItem.spoolNum || '';
+        document.getElementById('cableFormMarkStart').value = editItem.markStart !== undefined ? editItem.markStart : '';
+        document.getElementById('cableFormMarkEnd').value = editItem.markEnd !== undefined ? editItem.markEnd : '';
+        document.getElementById('cableFormQty').value = editItem.qty || 1;
+        document.getElementById('cableFormPinout').value = editItem.pinout || '';
+        document.getElementById('cableFormAssignee').value = editItem.assignee || state.activeUserName;
+        document.getElementById('cableFormDate').value = editItem.workDate || nowFormatted();
+        document.getElementById('cableFormNotes').value = editItem.notes || '';
+
+        const hasConduit = Boolean(editItem.conduit);
+        document.getElementById('cableCheckConduit').checked = hasConduit;
+        document.getElementById('cableConduitInputs').classList.toggle('hidden', !hasConduit);
+        if (hasConduit) {
+          document.getElementById('cableConduitType').value = editItem.conduit;
+          document.getElementById('cableConduitQty').value = editItem.conduitQty || editItem.qty;
+        }
+
+        // При редактировании склад не списываем повторно по умолчанию
+        document.getElementById('cableCheckDeductWarehouse').checked = false;
+        document.getElementById('cableDeductWarehouseBox').classList.add('hidden');
+      } else {
+        title.textContent = 'Записать расход кабеля / трассу';
+        document.getElementById('cableFormItemId').value = '';
+        
+        // Берем значения из быстрого калькулятора, если они были введены
+        const qs = document.getElementById('quickCalcStart')?.value.trim();
+        const qe = document.getElementById('quickCalcEnd')?.value.trim();
+        let calcLen = 1;
+        if (qs && qe && !isNaN(Number(qs)) && !isNaN(Number(qe))) {
+          calcLen = Math.abs(Number(qs) - Number(qe));
+          if (calcLen === 0) calcLen = 1;
+        }
+
+        const defaultGroup = state.cableGroupFilter !== 'all' ? state.cableGroupFilter : 'power';
+        document.getElementById('cableFormGroup').value = defaultGroup;
+        setCableGroupChoiceUI(defaultGroup);
+
+        document.getElementById('cableFormName').value = CABLE_PRESETS[defaultGroup][0] || 'Кабель ПВС 3х1.5';
+        const pogzPref = state.cablePogzFilter !== 'all' ? state.cablePogzFilter : 'ПогЗ №3 «Ворняны», рубеж 2';
+        document.getElementById('cableFormOrigin').value = pogzPref;
+        document.getElementById('cableFormSpool').value = '0501';
+        document.getElementById('cableFormMarkStart').value = qs || '';
+        document.getElementById('cableFormMarkEnd').value = qe || '';
+        document.getElementById('cableFormQty').value = calcLen;
+        document.getElementById('cableFormPinout').value = '';
+        document.getElementById('cableFormAssignee').value = state.activeUserName;
+        document.getElementById('cableFormDate').value = nowFormatted();
+        document.getElementById('cableFormNotes').value = '';
+
+        document.getElementById('cableCheckConduit').checked = false;
+        document.getElementById('cableConduitInputs').classList.add('hidden');
+        document.getElementById('cableConduitQty').value = calcLen;
+
+        document.getElementById('cableCheckDeductWarehouse').checked = true;
+        document.getElementById('cableDeductWarehouseBox').classList.remove('hidden');
+
+        // Авто-поиск подходящей бухты на складе
+        const sel = document.getElementById('cableSelectWarehouseSpool');
+        if (sel && sel.options.length > 1) {
+          sel.selectedIndex = 1;
+        }
+      }
+
+      modal.classList.remove('hidden');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function closeCableRunModal() {
+      document.getElementById('cableRunModal').classList.add('hidden');
+    }
+
+    function setCableGroupChoiceUI(grp) {
+      document.getElementById('cableFormGroup').value = grp;
+      document.querySelectorAll('.cable-group-choice-btn').forEach(btn => {
+        const choice = btn.getAttribute('data-cable-group-choice');
+        if (choice === grp) {
+          btn.className = 'cable-group-choice-btn py-2 px-1.5 rounded-xl border text-xs font-semibold text-center transition bg-amber-500/20 border-amber-500 text-amber-200';
+        } else {
+          btn.className = 'cable-group-choice-btn py-2 px-1.5 rounded-xl border text-xs font-semibold text-center transition bg-slate-950 border-slate-700 text-slate-300 hover:border-slate-600';
+        }
+      });
+      renderCablePresetsChips(grp);
     }
 
     function openItemFormModal(editItem) {
@@ -5644,6 +6405,8 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       switch (scope) {
         case 'current':
           return state.items.filter(it => it.room === state.activeRoom);
+        case 'cable':
+          return state.items.filter(it => it.room === 'cable');
         case 'devices':
           return state.items.filter(it => it.category === 'device');
         case 'attention':
@@ -6150,7 +6913,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       if (locInp) locInp.value = cfg.appLocation || 'Лида • ТСОГ';
 
       // Заполнение 4 помещений
-      for (const k of ['sklad', 'masterskaya', 'slesarka', 'vyezd']) {
+      for (const k of ['sklad', 'masterskaya', 'slesarka', 'vyezd', 'cable']) {
         const r = (cfg.rooms && cfg.rooms[k]) || DEFAULT_ROOMS[k];
         const nameEl = document.getElementById(`editRoomName_${k}`);
         const shortEl = document.getElementById(`editRoomShort_${k}`);
@@ -6184,7 +6947,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       const appLocation = document.getElementById('editAppLocation').value.trim() || 'Лида • ТСОГ';
 
       const newRooms = {};
-      for (const k of ['sklad', 'masterskaya', 'slesarka', 'vyezd']) {
+      for (const k of ['sklad', 'masterskaya', 'slesarka', 'vyezd', 'cable']) {
         const name = document.getElementById(`editRoomName_${k}`).value.trim() || DEFAULT_ROOMS[k].name;
         const shortName = document.getElementById(`editRoomShort_${k}`).value.trim() || DEFAULT_ROOMS[k].shortName;
         const title = document.getElementById(`editRoomTitle_${k}`).value.trim() || DEFAULT_ROOMS[k].title;
@@ -6812,8 +7575,14 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
 
       document.getElementById('btnQuickPullTop').addEventListener('click', pullFromGitHubGist);
 
-      document.getElementById('btnAddItemTop').addEventListener('click', () => openItemFormModal(null));
-      document.getElementById('fabAddItem').addEventListener('click', () => openItemFormModal(null));
+      document.getElementById('btnAddItemTop').addEventListener('click', () => {
+        if (state.activeRoom === 'cable') openCableRunModal(null);
+        else openItemFormModal(null);
+      });
+      document.getElementById('fabAddItem').addEventListener('click', () => {
+        if (state.activeRoom === 'cable') openCableRunModal(null);
+        else openItemFormModal(null);
+      });
       document.getElementById('btnCloseFormModal').addEventListener('click', closeItemFormModal);
       document.getElementById('btnCancelForm').addEventListener('click', closeItemFormModal);
 
@@ -6985,7 +7754,10 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
 
       document.getElementById('btnEditItem').addEventListener('click', () => {
         const item = state.items.find(i => i.id === state.selectedItemId);
-        if (item) openItemFormModal(item);
+        if (item) {
+          if (item.room === 'cable') openCableRunModal(item);
+          else openItemFormModal(item);
+        }
       });
 
       document.getElementById('btnDeleteItem').addEventListener('click', () => {
@@ -7143,6 +7915,239 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         URL.revokeObjectURL(url);
         showToast('Файл .JSON сохранен');
       });
+
+      
+      // --- Слушатели модуля расхода кабеля ---
+      const qStart = document.getElementById('quickCalcStart');
+      const qEnd = document.getElementById('quickCalcEnd');
+      if (qStart && qEnd) {
+        qStart.addEventListener('input', updateQuickCalc);
+        qEnd.addEventListener('input', updateQuickCalc);
+      }
+
+      const btnApplyCalc = document.getElementById('btnQuickCalcApply');
+      if (btnApplyCalc) {
+        btnApplyCalc.addEventListener('click', () => {
+          openCableRunModal(null);
+        });
+      }
+
+      document.querySelectorAll('.cable-grp-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.cableGroupFilter = btn.getAttribute('data-cable-group-filter');
+          document.querySelectorAll('.cable-grp-btn').forEach(b => {
+            if (b.getAttribute('data-cable-group-filter') === state.cableGroupFilter) {
+              b.className = 'cable-grp-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40';
+            } else {
+              b.className = 'cable-grp-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-950 text-slate-300 border border-slate-800 hover:text-white';
+            }
+          });
+          renderItemsList();
+        });
+      });
+
+      const pogzSel = document.getElementById('cablePogzFilterSelect');
+      if (pogzSel) {
+        pogzSel.addEventListener('change', () => {
+          state.cablePogzFilter = pogzSel.value;
+          renderItemsList();
+        });
+      }
+
+      const btnCloseCable = document.getElementById('btnCloseCableModal');
+      if (btnCloseCable) btnCloseCable.addEventListener('click', closeCableRunModal);
+      const btnCancelCable = document.getElementById('btnCancelCableForm');
+      if (btnCancelCable) btnCancelCable.addEventListener('click', closeCableRunModal);
+
+      document.querySelectorAll('.cable-group-choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const grp = btn.getAttribute('data-cable-group-choice');
+          setCableGroupChoiceUI(grp);
+        });
+      });
+
+      document.querySelectorAll('[data-pogz-chip]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const val = btn.getAttribute('data-pogz-chip');
+          const inp = document.getElementById('cableFormOrigin');
+          inp.value = val;
+          inp.focus();
+        });
+      });
+
+      document.querySelectorAll('[data-pinout-preset]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const preset = btn.getAttribute('data-pinout-preset');
+          const ta = document.getElementById('cableFormPinout');
+          if (ta.value.trim()) {
+            ta.value += `; ${preset}`;
+          } else {
+            ta.value = preset;
+          }
+        });
+      });
+
+      const markS = document.getElementById('cableFormMarkStart');
+      const markE = document.getElementById('cableFormMarkEnd');
+      const qtyInp = document.getElementById('cableFormQty');
+      const condInp = document.getElementById('cableConduitQty');
+
+      function syncCableMarksToQty() {
+        const s = parseFloat(markS.value);
+        const e = parseFloat(markE.value);
+        if (!isNaN(s) && !isNaN(e)) {
+          const diff = Math.abs(s - e);
+          const formatted = diff % 1 === 0 ? diff : Number(diff.toFixed(1));
+          qtyInp.value = formatted;
+          if (condInp && document.getElementById('cableCheckConduit').checked) {
+            condInp.value = formatted;
+          }
+        }
+      }
+      if (markS && markE) {
+        markS.addEventListener('input', syncCableMarksToQty);
+        markE.addEventListener('input', syncCableMarksToQty);
+      }
+
+      const checkConduit = document.getElementById('cableCheckConduit');
+      if (checkConduit) {
+        checkConduit.addEventListener('change', () => {
+          const box = document.getElementById('cableConduitInputs');
+          box.classList.toggle('hidden', !checkConduit.checked);
+          if (checkConduit.checked && qtyInp) {
+            condInp.value = qtyInp.value;
+          }
+        });
+      }
+
+      const checkDeduct = document.getElementById('cableCheckDeductWarehouse');
+      if (checkDeduct) {
+        checkDeduct.addEventListener('change', () => {
+          const box = document.getElementById('cableDeductWarehouseBox');
+          box.classList.toggle('hidden', !checkDeduct.checked);
+        });
+      }
+
+      const cableForm = document.getElementById('cableRunForm');
+      if (cableForm) {
+        cableForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (isReadOnly()) return;
+
+          const existingId = document.getElementById('cableFormItemId').value;
+          const cableGroup = document.getElementById('cableFormGroup').value || 'power';
+          const name = document.getElementById('cableFormName').value.trim();
+          const unitOrigin = document.getElementById('cableFormOrigin').value.trim();
+          const spoolNum = document.getElementById('cableFormSpool').value.trim();
+          const markStart = document.getElementById('cableFormMarkStart').value.trim();
+          const markEnd = document.getElementById('cableFormMarkEnd').value.trim();
+          const qty = Number(document.getElementById('cableFormQty').value) || 1;
+          const pinout = document.getElementById('cableFormPinout').value.trim();
+          const assignee = document.getElementById('cableFormAssignee').value.trim() || state.activeUserName;
+          const workDate = document.getElementById('cableFormDate').value.trim() || nowFormatted();
+          const notes = document.getElementById('cableFormNotes').value.trim();
+
+          const hasConduit = document.getElementById('cableCheckConduit').checked;
+          const conduit = hasConduit ? document.getElementById('cableConduitType').value : '';
+          const conduitQty = hasConduit ? (Number(document.getElementById('cableConduitQty').value) || qty) : 0;
+
+          if (!name || !unitOrigin) {
+            showToast('Ошибка: укажите марку кабеля и объект/заставу', 'error');
+            return;
+          }
+
+          const deductChecked = document.getElementById('cableCheckDeductWarehouse').checked;
+          const warehouseSpoolId = document.getElementById('cableSelectWarehouseSpool').value;
+
+          let targetWhItem = null;
+          if (deductChecked && warehouseSpoolId) {
+            targetWhItem = state.items.find(i => i.id === warehouseSpoolId);
+            if (targetWhItem) {
+              const prevWhQty = Number(targetWhItem.qty) || 0;
+              const newWhQty = Math.max(0, Number((prevWhQty - qty).toFixed(1)));
+              targetWhItem.qty = newWhQty;
+              targetWhItem.history = targetWhItem.history || [];
+              targetWhItem.history.unshift({
+                ts: nowFormatted(),
+                text: `Списано ${qty} м на трассу «${unitOrigin}» (${name}${spoolNum ? ', барабан ' + spoolNum : ''}) — ${assignee}`
+              });
+              addGlobalLog(`[Склад → Кабель] Списано ${qty} м кабеля «${targetWhItem.name}» на объект «${unitOrigin}»`);
+            }
+          }
+
+          if (existingId) {
+            const it = state.items.find(i => i.id === existingId);
+            if (it) {
+              it.name = name;
+              it.cableGroup = cableGroup;
+              it.unitOrigin = unitOrigin;
+              it.spoolNum = spoolNum;
+              it.serial = spoolNum ? `Барабан ${spoolNum}` : '';
+              it.markStart = markStart;
+              it.markEnd = markEnd;
+              it.qty = qty;
+              it.unit = 'м';
+              it.pinout = pinout;
+              it.conduit = conduit;
+              it.conduitQty = conduitQty;
+              it.assignee = assignee;
+              it.workDate = workDate;
+              it.notes = notes;
+              it.history = it.history || [];
+              it.history.unshift({
+                ts: nowFormatted(),
+                text: `Обновлена запись расхода (${qty} м, ${unitOrigin}) — ${state.activeUserName}`
+              });
+              addGlobalLog(`Обновлена кабельная трасса: ${name} (${qty} м на ${unitOrigin})`);
+            }
+            closeCableRunModal();
+            saveState();
+            renderAll();
+            showToast('Запись расхода обновлена!', 'success');
+          } else {
+            const newItem = {
+              id: 'cable-' + Date.now(),
+              code: generateNextCode(),
+              room: 'cable',
+              category: 'consumable',
+              cableGroup: cableGroup,
+              name: name,
+              serial: spoolNum ? `Барабан ${spoolNum}` : '',
+              spoolNum: spoolNum,
+              markStart: markStart,
+              markEnd: markEnd,
+              qty: qty,
+              unit: 'м',
+              minQty: 0,
+              resCurrent: 0,
+              resMax: 0,
+              nextMaint: '',
+              status: 'ok',
+              unitOrigin: unitOrigin,
+              assignee: assignee,
+              workDate: workDate,
+              pinout: pinout,
+              conduit: conduit,
+              conduitQty: conduitQty,
+              notes: notes,
+              photo: '',
+              cloudLink: '',
+              usedParts: [],
+              history: [
+                { ts: nowFormatted(), text: `Зафиксирован расход: ${qty} м на объект «${unitOrigin}» — ${assignee}` }
+              ]
+            };
+
+            state.items.unshift(newItem);
+            state.activeRoom = 'cable';
+            addGlobalLog(`[Расход кабеля] ${name}: ${qty} м на объект «${unitOrigin}» (${assignee})`);
+            closeCableRunModal();
+            saveState();
+            renderAll();
+            showToast(`Расход зафиксирован: ${qty} м на ${unitOrigin}`, 'success');
+          }
+        });
+      }
 
       document.getElementById('inputImportJson').addEventListener('change', (e) => {
         if (isReadOnly()) return;
