@@ -639,7 +639,21 @@
             <span class="text-[11px] text-slate-400 block">Неснижаемый остаток (порог)</span>
             <span id="detailMinStock" class="font-mono text-xs sm:text-sm font-medium text-slate-200 mt-0.5 block">—</span>
           </div>
-          <!-- Графы времени и даты проведения работ в подменю -->
+          <!-- Графы даты и времени проведения работ в подменю -->
+          <div id="detailWorkDateCard" class="bg-slate-950/60 border border-emerald-500/30 rounded-xl p-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] text-slate-400 flex items-center gap-1.5">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-400"></i>
+                Дата проведения работ
+              </span>
+              <button id="btnQuickEditWorkDate" type="button" class="text-[10px] font-semibold text-emerald-400 hover:text-emerald-300 transition hidden">Изменить</button>
+            </div>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span id="detailWorkDate" class="font-mono text-xs sm:text-sm font-semibold text-emerald-300 block">—</span>
+              <input id="detailWorkDateInput" type="date" class="hidden px-2 py-0.5 bg-slate-900 border border-emerald-500/50 rounded text-xs font-mono text-emerald-300 focus:outline-none" />
+              <button id="btnSaveWorkDate" type="button" class="hidden px-2.5 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold shadow transition">ОК</button>
+            </div>
+          </div>
           <div id="detailWorkTimeCard" class="bg-slate-950/60 border border-amber-500/30 rounded-xl p-2.5">
             <div class="flex items-center justify-between">
               <span class="text-[11px] text-slate-400 flex items-center gap-1.5">
@@ -653,13 +667,6 @@
               <input id="detailWorkTimeInput" type="time" class="hidden px-2 py-0.5 bg-slate-900 border border-amber-500/50 rounded text-xs font-mono text-amber-300 focus:outline-none" />
               <button id="btnSaveWorkTime" type="button" class="hidden px-2.5 py-0.5 rounded bg-amber-600 hover:bg-amber-500 text-white text-[10px] font-bold shadow transition">ОК</button>
             </div>
-          </div>
-          <div id="detailWorkDateCard" class="bg-slate-950/60 border border-slate-800/90 rounded-xl p-2.5">
-            <span class="text-[11px] text-slate-400 flex items-center gap-1.5">
-              <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-400"></i>
-              Дата проведения работ
-            </span>
-            <span id="detailWorkDate" class="font-mono text-xs sm:text-sm font-semibold text-white mt-0.5 block">—</span>
           </div>
         </div>
 
@@ -1304,6 +1311,18 @@
           <div>
             <label for="formNextMaint" class="block text-[11px] text-slate-400 mb-1">Дата след. ТО</label>
             <input id="formNextMaint" type="date" class="w-full px-2 py-1.5 bg-slate-900 border border-slate-800 rounded-lg font-mono text-xs text-white" />
+          </div>
+        </div>
+
+        <!-- Поля даты и времени проведения работ -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5">
+          <div>
+            <label for="formWorkDate" class="block text-xs text-slate-400 mb-1 font-medium">Дата проведения работ</label>
+            <input id="formWorkDate" type="date" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg font-mono text-xs text-white focus:outline-none focus:border-emerald-500" />
+          </div>
+          <div>
+            <label for="formWorkTime" class="block text-xs text-slate-400 mb-1 font-medium">Время проведения работ</label>
+            <input id="formWorkTime" type="time" class="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg font-mono text-xs text-white focus:outline-none focus:border-emerald-500" />
           </div>
         </div>
 
@@ -4904,6 +4923,20 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       const workTimeCard = document.getElementById('detailWorkTimeCard');
       const workDateCard = document.getElementById('detailWorkDateCard');
       const btnEditWorkTime = document.getElementById('btnQuickEditWorkTime');
+      const btnEditWorkDate = document.getElementById('btnQuickEditWorkDate');
+
+      // Сброс видимости инпутов при открытии модалки (если ранее оставались открытыми)
+      const workDateInp = document.getElementById('detailWorkDateInput');
+      const btnSaveDate = document.getElementById('btnSaveWorkDate');
+      if (workDateInp) workDateInp.classList.add('hidden');
+      if (btnSaveDate) btnSaveDate.classList.add('hidden');
+      if (workDateEl) workDateEl.classList.remove('hidden');
+
+      const workTimeInp = document.getElementById('detailWorkTimeInput');
+      const btnSaveTime = document.getElementById('btnSaveWorkTime');
+      if (workTimeInp) workTimeInp.classList.add('hidden');
+      if (btnSaveTime) btnSaveTime.classList.add('hidden');
+      if (workTimeEl) workTimeEl.classList.remove('hidden');
 
       if (itemWorkTime) {
         if (timeBadge) {
@@ -4911,23 +4944,25 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
           if (timeBadgeText) timeBadgeText.textContent = itemWorkTime;
         }
         if (workTimeEl) workTimeEl.textContent = itemWorkTime;
-        if (workTimeCard) workTimeCard.classList.remove('hidden');
       } else {
         if (timeBadge) timeBadge.classList.add('hidden');
         if (workTimeEl) workTimeEl.textContent = '—';
-        if (workTimeCard) workTimeCard.classList.add('hidden');
+      }
+      if (workTimeCard) workTimeCard.classList.remove('hidden');
+      if (btnEditWorkTime) {
+        btnEditWorkTime.classList.toggle('hidden', readOnly);
+        btnEditWorkTime.textContent = itemWorkTime ? 'Изменить' : 'Указать';
       }
 
       if (itemWorkDate) {
         if (workDateEl) workDateEl.textContent = itemWorkDate;
-        if (workDateCard) workDateCard.classList.remove('hidden');
       } else {
         if (workDateEl) workDateEl.textContent = '—';
-        if (workDateCard) workDateCard.classList.add('hidden');
       }
-
-      if (btnEditWorkTime) {
-        btnEditWorkTime.classList.toggle('hidden', readOnly || !itemWorkTime);
+      if (workDateCard) workDateCard.classList.remove('hidden');
+      if (btnEditWorkDate) {
+        btnEditWorkDate.classList.toggle('hidden', readOnly);
+        btnEditWorkDate.textContent = itemWorkDate ? 'Изменить' : 'Указать';
       }
 
       // Отображение распиновки муфты (для кабеля и трасс)
@@ -5624,6 +5659,9 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         document.getElementById('formResCurrent').value = editItem.resCurrent || 0;
         document.getElementById('formResMax').value = editItem.resMax || 0;
         document.getElementById('formNextMaint').value = editItem.nextMaint || '';
+        const { date: editWorkDate, time: editWorkTime } = getItemWorkDateTime(editItem);
+        document.getElementById('formWorkDate').value = editWorkDate || '';
+        document.getElementById('formWorkTime').value = editWorkTime || '';
         document.getElementById('formUnitOrigin').value = editItem.unitOrigin || '';
         document.getElementById('formAssignee').value = editItem.assignee || state.activeUserName;
         document.getElementById('formNotes').value = editItem.notes || '';
@@ -5654,6 +5692,8 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         document.getElementById('formResCurrent').value = 0;
         document.getElementById('formResMax').value = 0;
         document.getElementById('formNextMaint').value = '';
+        document.getElementById('formWorkDate').value = nowDateFormatted();
+        document.getElementById('formWorkTime').value = nowTimeFormatted();
         document.getElementById('formUnitOrigin').value = '';
         document.getElementById('formAssignee').value = state.activeUserName;
         document.getElementById('formNotes').value = '';
@@ -7782,6 +7822,8 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         const resCurrent = Number(document.getElementById('formResCurrent').value) || 0;
         const resMax = Number(document.getElementById('formResMax').value) || 0;
         const nextMaint = document.getElementById('formNextMaint').value;
+        const workDate = document.getElementById('formWorkDate').value.trim();
+        const workTime = document.getElementById('formWorkTime').value.trim();
         const unitOrigin = document.getElementById('formUnitOrigin').value.trim();
         const assignee = document.getElementById('formAssignee').value.trim();
         const notes = document.getElementById('formNotes').value.trim();
@@ -7812,6 +7854,8 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
             item.resCurrent = resCurrent;
             item.resMax = resMax;
             item.nextMaint = nextMaint;
+            item.workDate = workDate;
+            item.workTime = workTime;
             item.unitOrigin = unitOrigin;
             item.assignee = assignee;
             item.notes = notes;
@@ -7845,6 +7889,8 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
             resCurrent,
             resMax,
             nextMaint,
+            workDate: workDate || nowDateFormatted(),
+            workTime: workTime || nowTimeFormatted(),
             unitOrigin,
             assignee,
             notes,
@@ -7865,6 +7911,55 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         }
       });
 
+      // Слушатели быстрого редактирования даты работ в подменю позиции
+      const btnQuickEditDate = document.getElementById('btnQuickEditWorkDate');
+      const workDateInput = document.getElementById('detailWorkDateInput');
+      const btnSaveWorkDate = document.getElementById('btnSaveWorkDate');
+
+      if (btnQuickEditDate && workDateInput && btnSaveWorkDate) {
+        btnQuickEditDate.addEventListener('click', () => {
+          if (isReadOnly()) return;
+          const curDate = document.getElementById('detailWorkDate').textContent.trim();
+          workDateInput.value = (curDate !== '—') ? curDate : nowDateFormatted();
+          workDateInput.classList.remove('hidden');
+          btnSaveWorkDate.classList.remove('hidden');
+          document.getElementById('detailWorkDate').classList.add('hidden');
+          btnQuickEditDate.classList.add('hidden');
+          workDateInput.focus();
+        });
+
+        const performSaveDate = () => {
+          if (isReadOnly()) return;
+          const item = state.items.find(i => i.id === state.selectedItemId);
+          if (!item) return;
+          const newD = workDateInput.value.trim();
+          if (newD) {
+            item.workDate = newD;
+            item.history = item.history || [];
+            item.history.unshift({
+              ts: nowFormatted(),
+              text: `Изменена дата выполнения работ: ${newD} — ${state.activeUserName}`
+            });
+            saveState();
+            renderAll();
+            openItemDetailModal(item.id);
+            showToast(`Дата проведения работ обновлена: ${newD}`, 'success');
+          }
+          workDateInput.classList.add('hidden');
+          btnSaveWorkDate.classList.add('hidden');
+          document.getElementById('detailWorkDate').classList.remove('hidden');
+          btnQuickEditDate.classList.remove('hidden');
+        };
+
+        btnSaveWorkDate.addEventListener('click', performSaveDate);
+        workDateInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            performSaveDate();
+          }
+        });
+      }
+
       // Слушатели быстрого редактирования времени работ в подменю позиции
       const btnQuickEditTime = document.getElementById('btnQuickEditWorkTime');
       const workTimeInput = document.getElementById('detailWorkTimeInput');
@@ -7882,7 +7977,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
           workTimeInput.focus();
         });
 
-        btnSaveWorkTime.addEventListener('click', () => {
+        const performSaveTime = () => {
           if (isReadOnly()) return;
           const item = state.items.find(i => i.id === state.selectedItemId);
           if (!item) return;
@@ -7895,6 +7990,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
               text: `Изменено время выполнения работ: ${newT} — ${state.activeUserName}`
             });
             saveState();
+            renderAll();
             openItemDetailModal(item.id);
             showToast(`Время проведения работ обновлено: ${newT}`, 'success');
           }
@@ -7902,6 +7998,14 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
           btnSaveWorkTime.classList.add('hidden');
           document.getElementById('detailWorkTime').classList.remove('hidden');
           btnQuickEditTime.classList.remove('hidden');
+        };
+
+        btnSaveWorkTime.addEventListener('click', performSaveTime);
+        workTimeInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            performSaveTime();
+          }
         });
       }
 
