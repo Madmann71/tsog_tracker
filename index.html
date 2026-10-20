@@ -645,10 +645,11 @@
               </span>
               <button id="btnQuickEditWorkDate" type="button" class="text-[10px] font-semibold text-emerald-400 hover:text-emerald-300 transition hidden">Изменить</button>
             </div>
-            <div class="flex items-center gap-2 mt-0.5">
+            <div class="flex items-center gap-2 mt-0.5 flex-wrap">
               <span id="detailWorkDate" class="font-mono text-xs sm:text-sm font-semibold text-emerald-300 block">—</span>
               <input id="detailWorkDateInput" type="date" class="hidden px-2 py-0.5 bg-slate-900 border border-emerald-500/50 rounded text-xs font-mono text-emerald-300 focus:outline-none" />
               <button id="btnSaveWorkDate" type="button" class="hidden px-2.5 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold shadow transition">ОК</button>
+              <button id="btnClearWorkDate" type="button" class="hidden px-2 py-0.5 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-[10px] font-semibold transition">Убрать дату</button>
             </div>
           </div>
 
@@ -3950,14 +3951,6 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
       if (date && date.includes(' ')) {
         date = date.split(' ')[0];
       }
-      if (!date && item.history && item.history.length > 0) {
-        for (const h of item.history) {
-          if (h && h.ts && h.ts.includes(' ')) {
-            date = h.ts.split(' ')[0];
-            break;
-          }
-        }
-      }
       return date;
     }
 
@@ -3972,7 +3965,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = QRCodeGene
     }
 
     function isReadOnly() {
-      if (state.accessRole === 'viewer') return true;
+      if (!state.isAuthenticated || state.accessRole === 'viewer') return true;
       const current = state.editorsList.find(u => u.name === state.activeUserName);
       if (current && current.role === 'viewer') return true;
       return false;
@@ -4891,8 +4884,10 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       // Сброс видимости инпутов при открытии модалки (если ранее оставались открытыми)
       const workDateInp = document.getElementById('detailWorkDateInput');
       const btnSaveDate = document.getElementById('btnSaveWorkDate');
+      const btnClearDateEl = document.getElementById('btnClearWorkDate');
       if (workDateInp) workDateInp.classList.add('hidden');
       if (btnSaveDate) btnSaveDate.classList.add('hidden');
+      if (btnClearDateEl) btnClearDateEl.classList.add('hidden');
       if (workDateEl) workDateEl.classList.remove('hidden');
 
       if (itemWorkDate) {
@@ -5057,6 +5052,24 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       if (item.room === targetRoom) {
         showToast('Позиция уже находится в этом помещении', 'error');
         return;
+      }
+
+      if ((item.category === 'device' || item.category === 'zip') && targetRoom === 'cable') {
+        const btnCable = document.querySelector('[data-move-to="cable"]');
+        if (btnCable && !btnCable.__confirming) {
+          btnCable.__confirming = true;
+          const prevHtml = btnCable.innerHTML;
+          btnCable.innerHTML = '<i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-300"></i><span class="text-[10px]">В кабели? Нажмите еще</span>';
+          if (window.lucide) window.lucide.createIcons();
+          showToast('Прибор/модуль в кабельный раздел? Нажмите еще раз для подтверждения', 'info');
+          setTimeout(() => {
+            btnCable.__confirming = false;
+            btnCable.innerHTML = prevHtml;
+            if (window.lucide) window.lucide.createIcons();
+          }, 3500);
+          return;
+        }
+        if (btnCable) btnCable.__confirming = false;
       }
 
       const totalQty = Number(item.qty) || 0;
@@ -5252,9 +5265,10 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
     }
 
     function verifyPinAndLogin(fromLockScreen = false) {
-      const nameEl = fromLockScreen ? document.getElementById('lockUserSelect') : document.getElementById('activeUserNameSelect');
-      const pinEl = fromLockScreen ? document.getElementById('lockPinInput') : document.getElementById('pinCodeInput');
-      const feedback = fromLockScreen ? document.getElementById('lockScreenFeedback') : document.getElementById('pinAuthFeedback');
+      const isLock = fromLockScreen === true;
+      const nameEl = isLock ? document.getElementById('lockUserSelect') : document.getElementById('activeUserNameSelect');
+      const pinEl = isLock ? document.getElementById('lockPinInput') : document.getElementById('pinCodeInput');
+      const feedback = isLock ? document.getElementById('lockScreenFeedback') : document.getElementById('pinAuthFeedback');
 
       const selectedName = nameEl ? nameEl.value : '';
       const enteredPin = pinEl ? pinEl.value.trim() : '';
@@ -5532,7 +5546,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         setCableGroupChoiceUI(defaultGroup);
 
         document.getElementById('cableFormName').value = CABLE_PRESETS[defaultGroup][0] || 'Кабель ПВС 3х1.5';
-        const pogzPref = state.cablePogzFilter !== 'all' ? (document.querySelector()?.textContent || state.cablePogzFilter) : '3 ПОГЗ';
+        const pogzPref = state.cablePogzFilter !== 'all' ? (document.querySelector('#cablePogzFilterSelect option:checked')?.textContent || state.cablePogzFilter) : '3 ПОГЗ';
         document.getElementById('cableFormOrigin').value = pogzPref;
         document.getElementById('cableFormSpool').value = '0501';
         document.getElementById('cableFormMarkStart').value = qs || '';
@@ -5632,7 +5646,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         document.getElementById('formResCurrent').value = 0;
         document.getElementById('formResMax').value = 0;
         document.getElementById('formNextMaint').value = '';
-        document.getElementById('formWorkDate').value = nowDateFormatted();
+        document.getElementById('formWorkDate').value = state.activeRoom === 'cable' ? nowDateFormatted() : '';
         document.getElementById('formUnitOrigin').value = '';
         document.getElementById('formAssignee').value = state.activeUserName;
         document.getElementById('formNotes').value = '';
@@ -5931,6 +5945,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
     let lastGistRemoteUpdatedAt = '';
 
     async function pushToGitHubGist(silent = false) {
+      silent = (silent === true);
       const feedback = document.getElementById('cloudFeedbackMsg');
       if (isReadOnly()) {
         if (!silent) {
@@ -6028,6 +6043,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
     }
 
     async function pullFromGitHubGist(silent = false) {
+      silent = (silent === true);
       const token = (document.getElementById('githubTokenInput')?.value.trim() || state.githubToken).trim();
       const gistId = (document.getElementById('githubGistIdInput')?.value.trim() || state.githubGistId).trim();
       const feedback = document.getElementById('cloudFeedbackMsg');
@@ -7443,11 +7459,11 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       }
 
       document.getElementById('btnVerifyPin').addEventListener('click', () => verifyPinAndLogin(false));
-      document.getElementById('btnPinPadSubmit').addEventListener('click', verifyPinAndLogin);
+      document.getElementById('btnPinPadSubmit').addEventListener('click', () => verifyPinAndLogin(false));
       document.getElementById('pinCodeInput').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
-          verifyPinAndLogin();
+          verifyPinAndLogin(false);
         }
       });
       document.getElementById('manualQrInput').addEventListener('keydown', (e) => {
@@ -7573,6 +7589,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
 
           if (state.activeUserName === oldName) {
             state.activeUserName = newName;
+            try { sessionStorage.setItem('tsog_auth_session', JSON.stringify({ name: newName, pin: target.pin })); } catch (e) {}
           }
 
           state.items.forEach(it => {
@@ -7624,6 +7641,9 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
           }
 
           target.pin = newPin;
+          if (state.activeUserName === target.name) {
+            try { sessionStorage.setItem('tsog_auth_session', JSON.stringify({ name: target.name, pin: newPin })); } catch (e) {}
+          }
           addGlobalLog(`Изменен ПИН-код для «${target.name}» — ${state.activeUserName}`);
           saveState();
           renderAll();
@@ -7732,7 +7752,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         findAndOpenByCode(document.getElementById('manualQrInput').value);
       });
 
-      document.getElementById('btnQuickPullTop').addEventListener('click', pullFromGitHubGist);
+      document.getElementById('btnQuickPullTop').addEventListener('click', () => pullFromGitHubGist(false));
 
       document.getElementById('btnAddItemTop').addEventListener('click', () => {
         if (state.activeRoom === 'cable') openCableRunModal(null);
@@ -7826,7 +7846,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
             resCurrent,
             resMax,
             nextMaint,
-            workDate: workDate || nowDateFormatted(),
+            workDate: workDate || (room === 'cable' ? nowDateFormatted() : ''),
             unitOrigin,
             assignee,
             notes,
@@ -7851,6 +7871,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
       const btnQuickEditDate = document.getElementById('btnQuickEditWorkDate');
       const workDateInput = document.getElementById('detailWorkDateInput');
       const btnSaveWorkDate = document.getElementById('btnSaveWorkDate');
+      const btnClearDate = document.getElementById('btnClearWorkDate');
 
       if (btnQuickEditDate && workDateInput && btnSaveWorkDate) {
         btnQuickEditDate.addEventListener('click', () => {
@@ -7859,39 +7880,59 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
           workDateInput.value = (curDate !== '—') ? curDate : nowDateFormatted();
           workDateInput.classList.remove('hidden');
           btnSaveWorkDate.classList.remove('hidden');
+          if (btnClearDate) btnClearDate.classList.remove('hidden');
           document.getElementById('detailWorkDate').classList.add('hidden');
           btnQuickEditDate.classList.add('hidden');
           workDateInput.focus();
         });
 
-        const performSaveDate = () => {
+        const performSaveDate = (forceClear = false) => {
           if (isReadOnly()) return;
           const item = state.items.find(i => i.id === state.selectedItemId);
           if (!item) return;
-          const newD = workDateInput.value.trim();
+          const newD = forceClear ? '' : workDateInput.value.trim();
+
           if (newD) {
             item.workDate = newD;
             item.history = item.history || [];
             item.history.unshift({
               ts: nowFormatted(),
-              text: `Изменена дата выполнения работ: ${newD} — ${state.activeUserName}`
+              text: `Установлена дата работ: ${newD} — ${state.activeUserName}`
             });
             saveState();
             renderAll();
             openItemDetailModal(item.id);
             showToast(`Дата проведения работ обновлена: ${newD}`, 'success');
+          } else {
+            const hadDate = Boolean(item.workDate);
+            item.workDate = '';
+            if (hadDate) {
+              item.history = item.history || [];
+              item.history.unshift({
+                ts: nowFormatted(),
+                text: `Дата работ снята (очищена) — ${state.activeUserName}`
+              });
+            }
+            saveState();
+            renderAll();
+            openItemDetailModal(item.id);
+            showToast('Дата проведения работ удалена', 'info');
           }
           workDateInput.classList.add('hidden');
           btnSaveWorkDate.classList.add('hidden');
+          if (btnClearDate) btnClearDate.classList.add('hidden');
           document.getElementById('detailWorkDate').classList.remove('hidden');
           btnQuickEditDate.classList.remove('hidden');
         };
 
-        btnSaveWorkDate.addEventListener('click', performSaveDate);
+        btnSaveWorkDate.addEventListener('click', () => performSaveDate(false));
+        if (btnClearDate) {
+          btnClearDate.addEventListener('click', () => performSaveDate(true));
+        }
         workDateInput.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') {
             e.preventDefault();
-            performSaveDate();
+            performSaveDate(false);
           }
         });
       }
@@ -8002,19 +8043,38 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         }
       });
 
-      document.getElementById('btnDeleteItem').addEventListener('click', () => {
-        if (isReadOnly()) return;
-        const idx = state.items.findIndex(i => i.id === state.selectedItemId);
-        if (idx !== -1) {
+      const btnDelItem = document.getElementById('btnDeleteItem');
+      if (btnDelItem) {
+        btnDelItem.addEventListener('click', () => {
+          if (isReadOnly()) return;
+          const idx = state.items.findIndex(i => i.id === state.selectedItemId);
+          if (idx === -1) return;
           const removed = state.items[idx];
+
+          if (!btnDelItem.__confirming) {
+            btnDelItem.__confirming = true;
+            btnDelItem.innerHTML = '<i data-lucide="alert-triangle" class="w-4 h-4 text-amber-300"></i><span>Удалить? Нажмите еще раз</span>';
+            btnDelItem.className = 'px-3 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-lg shadow-rose-950/50';
+            if (window.lucide) window.lucide.createIcons();
+            showToast('Нажмите кнопку повторно для удаления позиции', 'error');
+            setTimeout(() => {
+              btnDelItem.__confirming = false;
+              btnDelItem.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4"></i><span>Удалить</span>';
+              btnDelItem.className = 'px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/25 text-xs font-semibold flex items-center gap-1.5 transition';
+              if (window.lucide) window.lucide.createIcons();
+            }, 4000);
+            return;
+          }
+
+          btnDelItem.__confirming = false;
           state.items.splice(idx, 1);
           addGlobalLog(`Удалена позиция: ${removed.name} из «${ROOMS[removed.room].name}»`);
           closeItemDetailModal();
           saveState();
           renderAll();
-          showToast('Позиция удалена');
-        }
-      });
+          showToast(`Удалено: ${removed.name}`, 'info');
+        });
+      }
 
       document.getElementById('btnOpenLog').addEventListener('click', () => {
         renderLogModal();
@@ -8136,8 +8196,8 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         }
       });
 
-      document.getElementById('btnPushGist').addEventListener('click', pushToGitHubGist);
-      document.getElementById('btnPullGist').addEventListener('click', pullFromGitHubGist);
+      document.getElementById('btnPushGist').addEventListener('click', () => pushToGitHubGist(false));
+      document.getElementById('btnPullGist').addEventListener('click', () => pullFromGitHubGist(false));
 
       document.getElementById('btnExportJson').addEventListener('click', () => {
         const blob = new Blob([JSON.stringify({
