@@ -400,13 +400,14 @@
           <span class="text-[11px] text-slate-400 font-medium">ПогЗ:</span>
           <select id="cablePogzFilterSelect" class="px-2.5 py-1 bg-slate-950 border border-slate-700 rounded-lg text-xs text-slate-200">
             <option value="all">Все объекты / ПогЗ</option>
-            <option value="1 погз">ПогЗ №1</option>
-            <option value="2 погз">ПогЗ №2</option>
-            <option value="3 погз">ПогЗ №3</option>
-            <option value="4 погз">ПогЗ №4</option>
-            <option value="5 погз">ПогЗ №5</option>
-            <option value="сервер">Серверная</option>
-            <option value="мастерск">Мастерская</option>
+            <option value="1 погз">1 ПОГЗ</option>
+            <option value="2 погз">2 ПОГЗ</option>
+            <option value="3 погз">3 ПОГЗ</option>
+            <option value="4 погз">4 ПОГЗ</option>
+            <option value="5 погз">5 ПОГЗ</option>
+            <option value="1 погп">1 ПОГП</option>
+            <option value="2 погп">2 ПОГП</option>
+            <option value="мг">МГ</option>
           </select>
         </div>
       </div>
@@ -991,17 +992,18 @@
             <i data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-400"></i>
             3. Объект / Застава / Трасса *
           </label>
-          <!-- Быстрые кнопки застав -->
+          <!-- Быстрые кнопки подразделений / застав -->
           <div class="flex flex-wrap gap-1">
-            <button type="button" data-pogz-chip="ПогЗ №1" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">1 ПогЗ</button>
-            <button type="button" data-pogz-chip="ПогЗ №2" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">2 ПогЗ</button>
-            <button type="button" data-pogz-chip="ПогЗ №3" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">3 ПогЗ</button>
-            <button type="button" data-pogz-chip="ПогЗ №4" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">4 ПогЗ</button>
-            <button type="button" data-pogz-chip="ПогЗ №5" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">5 ПогЗ</button>
-            <button type="button" data-pogz-chip="Серверная ТСОГ" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Серверная</button>
-            <button type="button" data-pogz-chip="Мастерская" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Мастерская</button>
+            <button type="button" data-pogz-chip="1 ПОГЗ" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300 font-medium">1 ПОГЗ</button>
+            <button type="button" data-pogz-chip="2 ПОГЗ" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300 font-medium">2 ПОГЗ</button>
+            <button type="button" data-pogz-chip="3 ПОГЗ" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300 font-medium">3 ПОГЗ</button>
+            <button type="button" data-pogz-chip="4 ПОГЗ" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300 font-medium">4 ПОГЗ</button>
+            <button type="button" data-pogz-chip="5 ПОГЗ" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300 font-medium">5 ПОГЗ</button>
+            <button type="button" data-pogz-chip="1 ПОГП" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300 font-medium">1 ПОГП</button>
+            <button type="button" data-pogz-chip="2 ПОГП" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300 font-medium">2 ПОГП</button>
+            <button type="button" data-pogz-chip="МГ" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] text-slate-300 font-medium">МГ</button>
           </div>
-          <input id="cableFormOrigin" type="text" required placeholder="Напр.: ПогЗ №3 «Ворняны», рубеж 2, опора 14" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500" />
+          <input id="cableFormOrigin" type="text" required placeholder="Напр.: 3 ПОГЗ, рубеж 2, опора 14" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white text-xs focus:outline-none focus:border-amber-500" />
         </div>
 
         <!-- 4. Барабан / Бухта и Метражные метки (Калькулятор) -->
@@ -4618,9 +4620,24 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
             if (grp !== state.cableGroupFilter) matchesCat = false;
           }
           if (state.cablePogzFilter && state.cablePogzFilter !== 'all') {
-            const pogzQ = state.cablePogzFilter.toLowerCase();
+            const pogzQ = state.cablePogzFilter.toLowerCase().trim();
             const originStr = String(item.unitOrigin || '').toLowerCase();
-            if (!originStr.includes(pogzQ)) matchesCat = false;
+            let matchesUnit = originStr.includes(pogzQ);
+            if (!matchesUnit) {
+              const numMatch = pogzQ.match(/^(\d+)\s*(погз|погп)/);
+              if (numMatch) {
+                const num = numMatch[1];
+                const type = numMatch[2];
+                matchesUnit = originStr.includes(type + ' №' + num) ||
+                              originStr.includes(type + ' ' + num) ||
+                              originStr.includes(type + '№' + num) ||
+                              originStr.includes(num + ' ' + type) ||
+                              originStr.includes(num + type);
+              } else if (pogzQ === 'мг') {
+                matchesUnit = originStr.includes('мг') || originStr.includes('мобильн');
+              }
+            }
+            if (!matchesUnit) matchesCat = false;
           }
         } else {
           if (state.categoryFilter === 'attention') {
@@ -5376,7 +5393,7 @@ pinTable.querySelectorAll('[data-user-role-change]').forEach(sel => {
         setCableGroupChoiceUI(defaultGroup);
 
         document.getElementById('cableFormName').value = CABLE_PRESETS[defaultGroup][0] || 'Кабель ПВС 3х1.5';
-        const pogzPref = state.cablePogzFilter !== 'all' ? state.cablePogzFilter : 'ПогЗ №3 «Ворняны», рубеж 2';
+        const pogzPref = state.cablePogzFilter !== 'all' ? (document.querySelector()?.textContent || state.cablePogzFilter) : '3 ПОГЗ';
         document.getElementById('cableFormOrigin').value = pogzPref;
         document.getElementById('cableFormSpool').value = '0501';
         document.getElementById('cableFormMarkStart').value = qs || '';
